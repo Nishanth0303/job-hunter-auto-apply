@@ -147,3 +147,4 @@ Location: Coimbatore, Tamil Nadu (Available for Remote India)`
   // Re-check on dynamic navigation
   setTimeout(createFloatingAssistant, 2000);
 })();
+
