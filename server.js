@@ -202,6 +202,20 @@ const server = http.createServer(async (req, res) => {
       ];
       const randomCompany = companies[Math.floor(Math.random() * companies.length)];
 
+      let matchedResume = "PHP Developer Resume";
+      let portfolioUrl = "https://nishanth0303.github.io/Nishanth-portfolio/php-dev.html";
+
+      if (selectedRole.includes("Full Stack") || selectedRole.includes("React")) {
+        matchedResume = "Full Stack Developer Resume";
+        portfolioUrl = "https://nishanth0303.github.io/Nishanth-portfolio/full-stack.html";
+      } else if (selectedRole.includes("Application") || selectedRole.includes("ERP") || selectedRole.includes("CRM") || selectedRole.includes("E-commerce")) {
+        matchedResume = "Application Developer Resume";
+        portfolioUrl = "https://nishanth0303.github.io/Nishanth-portfolio/application-dev.html";
+      } else if (selectedRole.includes("Software")) {
+        matchedResume = "Software Developer Resume";
+        portfolioUrl = "https://nishanth0303.github.io/Nishanth-portfolio/software-dev.html";
+      }
+
       const newJob = {
         id: 'job-ph-' + Date.now(),
         title: selectedRole + (Math.random() > 0.5 ? ' (5+ Yrs Exp - Laravel / MySQL)' : ' (Enterprise Apps)'),
@@ -211,14 +225,16 @@ const server = http.createServer(async (req, res) => {
         postedDate: new Date().toISOString(),
         matchScore: randomScore,
         matchTier: matchTier,
+        matchedResume: matchedResume,
+        portfolioUrl: portfolioUrl,
         status: 'pending',
         appliedDate: null,
         applyUrl: `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(selectedRole + ' ' + selectedLocation)}`,
         salary: `₹${Math.floor(Math.random() * 5) + 10},00,000 - ₹${Math.floor(Math.random() * 5) + 14},00,000 / year`,
         description: `We are looking for an experienced ${selectedRole} with 4-6 years of experience to lead backend systems. You will build and optimize business logic, REST APIs, and database architecture using PHP, Laravel, or CodeIgniter. Experience in ERP, CRM, billing, and payment gateways is strongly preferred.`,
-        fitReason: `${matchTier}: Highly aligned with your 5 years in PHP, Laravel 10, CodeIgniter, MySQL query optimization, and enterprise application development.`,
+        fitReason: `${matchTier}: Highly aligned with your 5 years in PHP, Laravel 10, CodeIgniter, MySQL query optimization, and enterprise application development. Suggested Resume: ${matchedResume}.`,
         gaps: "Node.js is not mandatory (role focuses on PHP/Laravel backend; light React UI components are a plus).",
-        coverNote: `Dear ${randomCompany} Hiring Team,\n\nI am writing to express my strong interest in the ${selectedRole} position. With 5 years of dedicated backend engineering experience in PHP, Laravel 10, CodeIgniter, and MySQL, I have architected and deployed mission-critical ERP, CRM, and billing solutions.\n\nMy core competencies include database schema optimization, secure RESTful API development, and seamless payment gateway integrations. I look forward to the possibility of discussing how my experience can benefit ${randomCompany}.\n\nBest regards,\nCandidate`
+        coverNote: `Dear ${randomCompany} Hiring Team,\n\nI am writing to express my strong interest in the ${selectedRole} position. With 5 years of dedicated backend engineering experience in PHP, Laravel 10, CodeIgniter, and MySQL, I have architected and deployed mission-critical ERP, CRM, and billing solutions at Icore Software Technologies and Rk Creators.\n\nMy core competencies include database schema optimization, secure RESTful API development, and seamless payment gateway integrations. I look forward to the possibility of discussing how my experience can benefit ${randomCompany}.\n\nPortfolio: ${portfolioUrl}\nLinkedIn: https://linkedin.com/in/rnishanth2004\n\nBest regards,\nNishanth R\nPhone: +91 8220607076\nEmail: r.nishanth2004@gmail.com\nCoimbatore, Tamil Nadu`
       };
 
       jobs.unshift(newJob);

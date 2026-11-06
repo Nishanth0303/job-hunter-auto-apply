@@ -1,4 +1,62 @@
 {
+  "candidate": {
+    "name": "Nishanth R",
+    "email": "r.nishanth2004@gmail.com",
+    "phone": "8220607076",
+    "location": "Coimbatore, Tamil Nadu",
+    "linkedIn": "https://linkedin.com/in/rnishanth2004",
+    "portfolioBase": "https://nishanth0303.github.io/Nishanth-portfolio/",
+    "experienceYears": 5,
+    "education": "B.E. Computer Science and Engineering (2017 - 2021)"
+  },
+  "resumeVariants": {
+    "php_developer": {
+      "name": "PHP Developer Resume",
+      "portfolio": "https://nishanth0303.github.io/Nishanth-portfolio/php-dev.html",
+      "roles": [
+        "PHP Developer",
+        "Laravel Developer",
+        "CodeIgniter Developer",
+        "PHP Backend Developer",
+        "Backend Developer – PHP",
+        "PHP MVC Developer",
+        "PHP Laravel Engineer",
+        "Laravel Backend Developer",
+        "API Developer – PHP"
+      ]
+    },
+    "full_stack": {
+      "name": "Full Stack Developer Resume",
+      "portfolio": "https://nishanth0303.github.io/Nishanth-portfolio/full-stack.html",
+      "roles": [
+        "PHP Full Stack Developer",
+        "Full Stack Web Developer",
+        "Junior React + PHP Developer"
+      ]
+    },
+    "application_developer": {
+      "name": "Application Developer Resume",
+      "portfolio": "https://nishanth0303.github.io/Nishanth-portfolio/application-dev.html",
+      "roles": [
+        "Application Developer",
+        "Web Application Developer",
+        "ERP Software Developer",
+        "CRM Software Developer",
+        "E-commerce Developer",
+        "Billing Software Developer"
+      ]
+    },
+    "software_developer": {
+      "name": "Software Developer Resume",
+      "portfolio": "https://nishanth0303.github.io/Nishanth-portfolio/software-dev.html",
+      "roles": [
+        "Software Developer – PHP",
+        "Software Engineer – PHP",
+        "Web Application Developer – PHP",
+        "MySQL Developer"
+      ]
+    }
+  },
   "targetRoles": [
     "PHP Developer",
     "Laravel Developer",
@@ -50,29 +108,8 @@
     ]
   },
   "location": "Coimbatore, Chennai, Bangalore, Remote",
-  "recipientEmail": "myemail@example.com",
+  "recipientEmail": "r.nishanth2004@gmail.com",
   "liveMachineUrl": "http://localhost:3000",
   "autoApplyThreshold": 85,
-  "experienceYears": 5,
-  "primarySkills": [
-    "PHP (5 Years)",
-    "Laravel 10",
-    "CodeIgniter 3 & 4",
-    "MySQL & Database Optimization",
-    "RESTful API Development",
-    "MVC Architecture",
-    "Payment Gateway Integrations",
-    "ERP Applications",
-    "CRM Systems",
-    "Billing & Invoicing Solutions",
-    "E-commerce Platforms"
-  ],
-  "secondarySkills": [
-    "React (1 Year Hands-on)",
-    "JavaScript (ES6+)",
-    "HTML5 & CSS3",
-    "Bootstrap 5",
-    "Basic Node.js Familiarity (Non-mandatory)"
-  ],
-  "userCV": "Experienced Software Engineer with 5 years of focused expertise specializing in PHP backend and web application development with Laravel (including Laravel 10) and CodeIgniter (3 & 4). Proven track record architecting enterprise systems such as ERP, CRM, Billing platforms, and E-commerce websites. Skilled in complex MySQL query optimization, robust REST API architecture, and third-party payment gateway integrations. Possesses 1 year of practical hands-on experience in React for responsive UI components, alongside basic familiarity with Node.js."
+  "userCV": "NISHANTH R | Coimbatore, Tamil Nadu | r.nishanth2004@gmail.com | 8220607076\n\nPROFESSIONAL SUMMARY:\nSoftware / PHP Developer with 5 years of experience building and maintaining web applications in Laravel and CodeIgniter. Strong in MVC architecture, MySQL database design and optimization, REST API development, payment gateway integration, and cloud (S3) storage integration. Delivered e-commerce platforms, ERP, CMS, billing systems, and a full CRM end-to-end, translating client requirements into scalable, production-ready PHP applications. Hands-on 1 year experience in React frontend components connected to Laravel backends."
 }

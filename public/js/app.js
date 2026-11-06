@@ -177,6 +177,7 @@ function renderTable(jobs) {
             <span><i class="bi bi-geo-alt me-1"></i>${escapeHtml(job.location)}</span>
             ${job.salary ? `<span>•</span><span class="text-success fw-semibold">${escapeHtml(job.salary)}</span>` : ''}
           </div>
+          ${job.matchedResume ? `<div class="mt-1"><span class="badge bg-light text-secondary border" style="font-size:0.7rem;"><i class="bi bi-file-earmark-person me-1"></i>${escapeHtml(job.matchedResume)}</span></div>` : ''}
         </td>
         <td style="min-width: 140px;">
           <div class="d-flex align-items-center justify-content-between mb-1">
@@ -226,6 +227,15 @@ function openReviewById(id) {
   document.getElementById('modalLocation').innerText = job.location;
   document.getElementById('modalSalary').innerText = job.salary || 'Competitive';
   document.getElementById('modalMatchScore').innerText = `${job.matchScore}% Match`;
+  document.getElementById('modalMatchedResume').innerText = job.matchedResume || 'PHP Developer Resume';
+  const portfolioLink = document.getElementById('modalPortfolioLink');
+  if (job.portfolioUrl) {
+    portfolioLink.href = job.portfolioUrl;
+    portfolioLink.style.display = 'inline-flex';
+  } else {
+    portfolioLink.style.display = 'none';
+  }
+
   document.getElementById('modalDescription').innerText = job.description || 'No detailed description available.';
   document.getElementById('modalFitReason').innerText = job.fitReason || 'High match with target skillset.';
   document.getElementById('modalGaps').innerText = job.gaps || 'None significant.';
