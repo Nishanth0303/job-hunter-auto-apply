@@ -1,0 +1,41 @@
+name: Automated Job Hunter & Email Alert Tracker
+
+on:
+  schedule:
+    # Runs at 6:00 AM IST (00:30 UTC) and every 3 hours (03:30, 06:30, 09:30, 12:30, 15:30, 18:30, 21:30 UTC)
+    - cron: '30 0,3,6,9,12,15,18,21 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI anytime
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  track-and-update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run Job Hunter Tracker & Email Alert
+        run: |
+          node cron-tracker.js --run-now
+
+      - name: Commit Updated Top 20 Jobs & Daily History
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git diff --quiet && git diff --staged --quiet || git commit -m "chore(auto): daily top 20 ranked jobs updated [skip ci]"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

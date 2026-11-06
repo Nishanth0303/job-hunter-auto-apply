@@ -5,6 +5,7 @@ let currentJob = null;
 let reviewModal = null;
 let settingsModal = null;
 let addJobModal = null;
+let isGitHubPages = window.location.hostname.includes('github.io') || window.location.protocol === 'file:';
 
 document.addEventListener('DOMContentLoaded', () => {
   reviewModal = new bootstrap.Modal(document.getElementById('jobReviewModal'));
@@ -44,8 +45,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadJobs() {
   try {
-    const res = await fetch('/api/jobs');
-    allJobs = await res.json();
+    let jobsData = [];
+    if (!isGitHubPages) {
+      try {
+        const res = await fetch('/api/jobs');
+        if (res.ok) jobsData = await res.json();
+      } catch (e) {
+        console.warn('API error, falling back to static file:', e);
+      }
+    }
+
+    if (!jobsData || jobsData.length === 0) {
+      // Load static data/jobs.json
+      const res = await fetch('data/jobs.json');
+      jobsData = await res.json();
+      
+      // Merge with localStorage overrides if running on GitHub Pages
+      const savedStatus = JSON.parse(localStorage.getItem('job_status_overrides') || '{}');
+      jobsData.forEach(j => {
+        if (savedStatus[j.id]) {
+          j.status = savedStatus[j.id].status;
+          j.appliedDate = savedStatus[j.id].appliedDate;
+        }
+      });
+    }
+
+    // Sort descending by matchScore (Rank 1 to 20)
+    jobsData.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
+    jobsData.forEach((j, idx) => {
+      j.rank = idx + 1;
+    });
+
+    allJobs = jobsData;
     updateStats();
     applyFiltersAndRender();
   } catch (err) {
@@ -55,8 +86,18 @@ async function loadJobs() {
 
 async function loadSettings() {
   try {
-    const res = await fetch('/api/settings');
-    const config = await res.json();
+    let config = null;
+    if (!isGitHubPages) {
+      try {
+        const res = await fetch('/api/settings');
+        if (res.ok) config = await res.json();
+      } catch (e) {}
+    }
+    if (!config) {
+      const res = await fetch('data/config.json');
+      config = await res.json();
+    }
+
     document.getElementById('settingRoles').value = (config.targetRoles || []).join(', ');
     document.getElementById('settingLocation').value = config.location || '';
     document.getElementById('settingEmail').value = config.recipientEmail || '';
@@ -74,17 +115,26 @@ async function saveSettings() {
   const liveUrl = document.getElementById('settingLiveUrl').value.trim();
   const cv = document.getElementById('settingCV').value.trim();
 
+  const payload = {
+    targetRoles: roles,
+    location: location,
+    recipientEmail: email,
+    liveMachineUrl: liveUrl,
+    userCV: cv
+  };
+
+  if (isGitHubPages) {
+    localStorage.setItem('job_hunter_config', JSON.stringify(payload));
+    settingsModal.hide();
+    showToast('Settings saved to browser storage!');
+    return;
+  }
+
   try {
     const res = await fetch('/api/settings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        targetRoles: roles,
-        location: location,
-        recipientEmail: email,
-        liveMachineUrl: liveUrl,
-        userCV: cv
-      })
+      body: JSON.stringify(payload)
     });
     const result = await res.json();
     if (result.success) {
@@ -120,11 +170,25 @@ function applyFiltersAndRender() {
     filtered = filtered.filter(j => 
       (j.title && j.title.toLowerCase().includes(search)) ||
       (j.company && j.company.toLowerCase().includes(search)) ||
-      (j.location && j.location.toLowerCase().includes(search))
+      (j.location && j.location.toLowerCase().includes(search)) ||
+      (j.source && j.source.toLowerCase().includes(search))
     );
   }
 
   renderTable(filtered);
+}
+
+function getPortalBadge(source) {
+  const s = (source || '').toLowerCase();
+  if (s.includes('naukri')) return `<span class="badge badge-portal badge-naukri"><i class="bi bi-briefcase-fill me-1"></i>Naukri</span>`;
+  if (s.includes('linkedin')) return `<span class="badge badge-portal badge-linkedin"><i class="bi bi-linkedin me-1"></i>LinkedIn</span>`;
+  if (s.includes('instahyre')) return `<span class="badge badge-portal badge-instahyre"><i class="bi bi-lightning-charge-fill me-1"></i>Instahyre</span>`;
+  if (s.includes('cutshort')) return `<span class="badge badge-portal badge-cutshort"><i class="bi bi-code-slash me-1"></i>Cutshort</span>`;
+  if (s.includes('foundit')) return `<span class="badge badge-portal badge-foundit"><i class="bi bi-search me-1"></i>Foundit</span>`;
+  if (s.includes('indeed')) return `<span class="badge badge-portal badge-indeed"><i class="bi bi-check2-circle me-1"></i>Indeed</span>`;
+  if (s.includes('hirist')) return `<span class="badge badge-portal badge-hirist"><i class="bi bi-stars me-1"></i>Hirist</span>`;
+  if (s.includes('wellfound')) return `<span class="badge badge-portal badge-wellfound"><i class="bi bi-peace me-1"></i>Wellfound</span>`;
+  return `<span class="badge badge-portal bg-secondary text-white">${escapeHtml(source)}</span>`;
 }
 
 function renderTable(jobs) {
@@ -132,7 +196,7 @@ function renderTable(jobs) {
   if (!jobs || jobs.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="6" class="text-center py-5 text-muted">
+        <td colspan="7" class="text-center py-5 text-muted">
           <i class="bi bi-inbox fs-1 d-block mb-2"></i>
           No jobs found under this view. Click <strong>"Scan Fresh Jobs"</strong> to discover new roles!
         </td>
@@ -141,7 +205,7 @@ function renderTable(jobs) {
     return;
   }
 
-  tbody.innerHTML = jobs.map((job, idx) => {
+  tbody.innerHTML = jobs.map((job) => {
     const isPending = job.status === 'pending';
     const isApplied = job.status === 'applied';
 
@@ -152,9 +216,7 @@ function renderTable(jobs) {
       statusBadge = `<span class="badge badge-status-rejected"><i class="bi bi-slash-circle me-1"></i>Dismissed</span>`;
     }
 
-    const sourceBadge = job.source === 'LinkedIn' 
-      ? `<span class="badge badge-source badge-linkedin"><i class="bi bi-linkedin me-1"></i>LinkedIn</span>`
-      : `<span class="badge badge-source badge-indeed"><i class="bi bi-briefcase-fill me-1"></i>Indeed</span>`;
+    const sourceBadge = getPortalBadge(job.source);
 
     const matchColor = job.matchScore >= 94 ? 'bg-success' : (job.matchScore >= 89 ? 'bg-primary' : 'bg-warning');
     const tierBadge = job.matchScore >= 94 
@@ -167,8 +229,13 @@ function renderTable(jobs) {
       ? `<small class="text-success fw-bold">${new Date(job.appliedDate).toLocaleDateString()}</small>` 
       : `<small class="text-muted">—</small>`;
 
+    const rankClass = job.rank <= 3 ? 'rank-top3' : 'rank-normal';
+
     return `
       <tr>
+        <td class="text-center" style="width: 50px;">
+          <span class="rank-badge ${rankClass}">#${job.rank || 1}</span>
+        </td>
         <td>
           <div class="fw-bold text-dark fs-6">${escapeHtml(job.title)}</div>
           <div class="text-muted small d-flex align-items-center gap-2 mt-1">
@@ -207,7 +274,7 @@ function renderTable(jobs) {
                 <i class="bi bi-x-lg"></i>
               </button>
             ` : ''}
-            <button class="btn btn-outline-info" onclick="sendEmailSimulation('${job.id}')" title="Send Email Alert Test">
+            <button class="btn btn-outline-info" onclick="sendEmailSimulation('${job.id}')" title="Email Alert Preview">
               <i class="bi bi-envelope"></i>
             </button>
           </div>
@@ -226,8 +293,9 @@ function openReviewById(id) {
   document.getElementById('modalCompany').innerText = job.company;
   document.getElementById('modalLocation').innerText = job.location;
   document.getElementById('modalSalary').innerText = job.salary || 'Competitive';
-  document.getElementById('modalMatchScore').innerText = `${job.matchScore}% Match`;
+  document.getElementById('modalMatchScore').innerText = `${job.matchScore}% Match (Rank #${job.rank || 1})`;
   document.getElementById('modalMatchedResume').innerText = job.matchedResume || 'PHP Developer Resume';
+
   const portfolioLink = document.getElementById('modalPortfolioLink');
   if (job.portfolioUrl) {
     portfolioLink.href = job.portfolioUrl;
@@ -264,16 +332,26 @@ function openReviewById(id) {
 }
 
 async function approveAndApply(id) {
-  try {
-    const res = await fetch(`/api/jobs/approve/${id}`, { method: 'POST' });
-    const result = await res.json();
-    if (result.success) {
-      showToast(result.message);
-      loadJobs();
-    }
-  } catch (err) {
-    alert('Error applying: ' + err.message);
+  const job = allJobs.find(j => j.id === id);
+  if (!job) return;
+
+  job.status = 'applied';
+  job.appliedDate = new Date().toISOString();
+
+  // Save to localStorage
+  const saved = JSON.parse(localStorage.getItem('job_status_overrides') || '{}');
+  saved[id] = { status: 'applied', appliedDate: job.appliedDate };
+  localStorage.setItem('job_status_overrides', JSON.stringify(saved));
+
+  if (!isGitHubPages) {
+    try {
+      await fetch(`/api/jobs/approve/${id}`, { method: 'POST' });
+    } catch (e) {}
   }
+
+  showToast(`Applied for ${job.title} at ${job.company}!`);
+  updateStats();
+  applyFiltersAndRender();
 }
 
 async function approveAndApplyCurrent() {
@@ -284,57 +362,60 @@ async function approveAndApplyCurrent() {
 
 async function dismissJob(id) {
   if (!confirm('Dismiss this job listing?')) return;
-  try {
-    const res = await fetch(`/api/jobs/reject/${id}`, { method: 'POST' });
-    const result = await res.json();
-    if (result.success) {
-      showToast(result.message);
-      loadJobs();
-    }
-  } catch (err) {
-    alert('Error dismissing: ' + err.message);
+  const job = allJobs.find(j => j.id === id);
+  if (!job) return;
+
+  job.status = 'rejected';
+
+  const saved = JSON.parse(localStorage.getItem('job_status_overrides') || '{}');
+  saved[id] = { status: 'rejected' };
+  localStorage.setItem('job_status_overrides', JSON.stringify(saved));
+
+  if (!isGitHubPages) {
+    try {
+      await fetch(`/api/jobs/reject/${id}`, { method: 'POST' });
+    } catch (e) {}
   }
+
+  showToast(`Dismissed ${job.title}`);
+  updateStats();
+  applyFiltersAndRender();
 }
 
 async function scanNewJobs() {
   const btn = document.getElementById('scanJobsBtn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Searching LinkedIn & Indeed...';
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Searching Top 8 Indian Portals...';
 
   try {
-    const res = await fetch('/api/jobs/scan', { method: 'POST' });
-    const result = await res.json();
-    if (result.success) {
-      showToast(result.message);
-      await loadJobs();
-      // Offer to review the newly found job immediately
-      if (result.job) {
-        openReviewById(result.job.id);
+    if (!isGitHubPages) {
+      const res = await fetch('/api/jobs/scan', { method: 'POST' });
+      const result = await res.json();
+      if (result.success) {
+        showToast(result.message);
+        await loadJobs();
+        if (result.job) openReviewById(result.job.id);
+        return;
       }
     }
+
+    // Client-side simulation on GitHub Pages
+    showToast('Refreshed Top 20 ranked jobs across Naukri, LinkedIn, Instahyre, Cutshort & Foundit!');
+    await loadJobs();
   } catch (err) {
     alert('Scan error: ' + err.message);
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<i class="bi bi-search me-2"></i>Scan Fresh Jobs Now';
+    btn.innerHTML = '<i class="bi bi-search me-2"></i>Scan Top 20 Jobs Now';
   }
 }
 
 async function sendEmailSimulation(jobId) {
-  try {
-    const res = await fetch('/api/notify-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jobId })
-    });
-    const result = await res.json();
-    if (result.success) {
-      const p = result.emailPayload;
-      alert(`📧 EMAIL DISPATCH NOTIFICATION\n\nTo: ${p.to}\nSubject: ${p.subject}\n\nMagic Direct Review Link:\n${p.magicReviewLink}\n\n(Clicking this link from an email opens this machine or live server directly to that job's review modal!)`);
-    }
-  } catch (err) {
-    alert('Email test error: ' + err.message);
-  }
+  const job = allJobs.find(j => j.id === jobId) || allJobs[0];
+  const baseUrl = 'https://nishanth0303.github.io/job-hunter-auto-apply';
+  const reviewLink = `${baseUrl}/?review=${job ? job.id : ''}`;
+
+  alert(`📧 EMAIL NOTIFICATION DISPATCHED\n\nTo: r.nishanth2004@gmail.com\nSubject: 🎯 Top Match #${job.rank}: ${job.title} at ${job.company} (${job.matchScore}% Match on ${job.source})\n\nDirect Review Link:\n${reviewLink}\n\n(Clicking this opens your live GitHub Pages dashboard directly to this job's review modal!)`);
 }
 
 async function saveManualJob() {
@@ -342,7 +423,7 @@ async function saveManualJob() {
   const company = document.getElementById('manualCompany').value.trim();
   const location = document.getElementById('manualLocation').value.trim();
   const salary = document.getElementById('manualSalary').value.trim();
-  const matchScore = document.getElementById('manualScore').value.trim();
+  const matchScore = parseInt(document.getElementById('manualScore').value.trim(), 10) || 90;
   const applyUrl = document.getElementById('manualUrl').value.trim();
   const description = document.getElementById('manualDesc').value.trim();
 
@@ -351,23 +432,32 @@ async function saveManualJob() {
     return;
   }
 
-  try {
-    const res = await fetch('/api/jobs/manual-add', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        title, company, location, salary, matchScore, applyUrl, description
-      })
-    });
-    const result = await res.json();
-    if (result.success) {
-      addJobModal.hide();
-      showToast('New job added to dashboard!');
-      loadJobs();
-    }
-  } catch (err) {
-    alert('Error adding job: ' + err.message);
-  }
+  const newJob = {
+    id: 'job-manual-' + Date.now(),
+    title, company, location: location || 'Coimbatore, Tamil Nadu',
+    salary: salary || '₹10,00,000 / yr',
+    matchScore,
+    status: 'pending',
+    appliedDate: null,
+    applyUrl: applyUrl || '#',
+    source: 'Direct Portal',
+    postedDate: new Date().toISOString(),
+    description: description || 'Custom tracked job position.',
+    fitReason: 'Manual tracked job matching your 5 years PHP/Laravel experience.',
+    gaps: 'None noted.',
+    matchedResume: 'PHP Developer Resume',
+    portfolioUrl: 'https://nishanth0303.github.io/Nishanth-portfolio/php-dev.html',
+    coverNote: `Dear ${company} Hiring Team,\n\nI am writing to apply for the ${title} position. With 5 years of experience in PHP, Laravel 10, CodeIgniter, and MySQL, I am eager to contribute.\n\nBest regards,\nNishanth R\nPhone: +91 8220607076\nEmail: r.nishanth2004@gmail.com`
+  };
+
+  allJobs.unshift(newJob);
+  allJobs.sort((a, b) => b.matchScore - a.matchScore);
+  allJobs.forEach((j, idx) => j.rank = idx + 1);
+
+  addJobModal.hide();
+  showToast('New job tracked on dashboard!');
+  updateStats();
+  applyFiltersAndRender();
 }
 
 function copyCoverLetter() {

@@ -4,15 +4,20 @@
   "description": "Automated Job Hunt, CV Matching, Email Notification & 1-Click Auto-Apply Dashboard",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "track": "node cron-tracker.js",
+    "track:now": "node cron-tracker.js --run-now"
   },
   "keywords": [
     "job-hunter",
     "auto-apply",
     "cv-matching",
     "dashboard",
-    "automation"
+    "automation",
+    "php",
+    "laravel",
+    "codeigniter"
   ],
-  "author": "",
+  "author": "Nishanth R",
   "license": "MIT"
 }

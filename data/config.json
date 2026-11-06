@@ -4,59 +4,84 @@
     "email": "r.nishanth2004@gmail.com",
     "phone": "8220607076",
     "location": "Coimbatore, Tamil Nadu",
+    "preferredLocations": [
+      "Coimbatore",
+      "Chennai",
+      "Bangalore",
+      "Remote (Inside India)"
+    ],
     "linkedIn": "https://linkedin.com/in/rnishanth2004",
     "portfolioBase": "https://nishanth0303.github.io/Nishanth-portfolio/",
     "experienceYears": 5,
     "education": "B.E. Computer Science and Engineering (2017 - 2021)"
   },
-  "resumeVariants": {
-    "php_developer": {
-      "name": "PHP Developer Resume",
-      "portfolio": "https://nishanth0303.github.io/Nishanth-portfolio/php-dev.html",
-      "roles": [
-        "PHP Developer",
-        "Laravel Developer",
-        "CodeIgniter Developer",
-        "PHP Backend Developer",
-        "Backend Developer – PHP",
-        "PHP MVC Developer",
-        "PHP Laravel Engineer",
-        "Laravel Backend Developer",
-        "API Developer – PHP"
-      ]
-    },
-    "full_stack": {
-      "name": "Full Stack Developer Resume",
-      "portfolio": "https://nishanth0303.github.io/Nishanth-portfolio/full-stack.html",
-      "roles": [
-        "PHP Full Stack Developer",
-        "Full Stack Web Developer",
-        "Junior React + PHP Developer"
-      ]
-    },
-    "application_developer": {
-      "name": "Application Developer Resume",
-      "portfolio": "https://nishanth0303.github.io/Nishanth-portfolio/application-dev.html",
-      "roles": [
-        "Application Developer",
-        "Web Application Developer",
-        "ERP Software Developer",
-        "CRM Software Developer",
-        "E-commerce Developer",
-        "Billing Software Developer"
-      ]
-    },
-    "software_developer": {
-      "name": "Software Developer Resume",
-      "portfolio": "https://nishanth0303.github.io/Nishanth-portfolio/software-dev.html",
-      "roles": [
-        "Software Developer – PHP",
-        "Software Engineer – PHP",
-        "Web Application Developer – PHP",
-        "MySQL Developer"
-      ]
-    }
+  "gitPagesUrl": "https://nishanth0303.github.io/job-hunter-auto-apply",
+  "liveMachineUrl": "https://nishanth0303.github.io/job-hunter-auto-apply",
+  "targetJobCount": 20,
+  "scheduleConfig": {
+    "morningRunTime": "06:00 AM",
+    "intervalHours": 3,
+    "instantAlertThreshold": 90,
+    "activeDays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+    "timeSlots": [
+      "06:00 AM",
+      "09:00 AM",
+      "12:00 PM",
+      "03:00 PM",
+      "06:00 PM",
+      "09:00 PM"
+    ]
   },
+  "topPortals": [
+    {
+      "name": "Naukri",
+      "url": "https://www.naukri.com/",
+      "badge": "badge-naukri",
+      "specialty": "Must Use - IT Services & Experienced Developers"
+    },
+    {
+      "name": "LinkedIn",
+      "url": "https://www.linkedin.com/jobs/",
+      "badge": "badge-linkedin",
+      "specialty": "MNCs, Product Companies & Remote"
+    },
+    {
+      "name": "Instahyre",
+      "url": "https://www.instahyre.com/",
+      "badge": "badge-instahyre",
+      "specialty": "Curated Tech Firms & Senior Engineers"
+    },
+    {
+      "name": "Cutshort",
+      "url": "https://cutshort.io/",
+      "badge": "badge-cutshort",
+      "specialty": "Startups, Laravel & Modern Tech"
+    },
+    {
+      "name": "Foundit",
+      "url": "https://www.foundit.in/",
+      "badge": "badge-foundit",
+      "specialty": "Enterprise IT & Software Opportunities"
+    },
+    {
+      "name": "Indeed",
+      "url": "https://in.indeed.com/",
+      "badge": "badge-indeed",
+      "specialty": "Direct Company Career Pages"
+    },
+    {
+      "name": "Hirist",
+      "url": "https://www.hirist.tech/",
+      "badge": "badge-hirist",
+      "specialty": "Premium Tech Unicorns & Product Roles"
+    },
+    {
+      "name": "Wellfound",
+      "url": "https://wellfound.com/",
+      "badge": "badge-wellfound",
+      "specialty": "Startups & Remote Positions"
+    }
+  ],
   "targetRoles": [
     "PHP Developer",
     "Laravel Developer",
@@ -79,37 +104,8 @@
     "Full Stack Web Developer",
     "Junior React + PHP Developer"
   ],
-  "jobTitleTiers": {
-    "excellent": [
-      "PHP Developer",
-      "Laravel Developer",
-      "CodeIgniter Developer",
-      "PHP Backend Developer",
-      "Backend Developer – PHP",
-      "Software Developer – PHP",
-      "PHP MVC Developer",
-      "PHP Laravel Engineer"
-    ],
-    "veryGood": [
-      "PHP Full Stack Developer",
-      "Web Application Developer",
-      "Laravel Backend Developer",
-      "API Developer – PHP",
-      "Software Engineer – PHP",
-      "Web Application Developer – PHP",
-      "ERP Software Developer",
-      "CRM Software Developer",
-      "E-commerce Developer"
-    ],
-    "good": [
-      "MySQL Developer",
-      "Full Stack Web Developer",
-      "Junior React + PHP Developer"
-    ]
-  },
-  "location": "Coimbatore, Chennai, Bangalore, Remote",
+  "location": "Coimbatore / Chennai / Bangalore / Remote (Inside India)",
   "recipientEmail": "r.nishanth2004@gmail.com",
-  "liveMachineUrl": "http://localhost:3000",
   "autoApplyThreshold": 85,
   "userCV": "NISHANTH R | Coimbatore, Tamil Nadu | r.nishanth2004@gmail.com | 8220607076\n\nPROFESSIONAL SUMMARY:\nSoftware / PHP Developer with 5 years of experience building and maintaining web applications in Laravel and CodeIgniter. Strong in MVC architecture, MySQL database design and optimization, REST API development, payment gateway integration, and cloud (S3) storage integration. Delivered e-commerce platforms, ERP, CMS, billing systems, and a full CRM end-to-end, translating client requirements into scalable, production-ready PHP applications. Hands-on 1 year experience in React frontend components connected to Laravel backends."
 }
