@@ -295,6 +295,8 @@ function openReviewById(id) {
   document.getElementById('modalCompany').innerText = job.company;
   document.getElementById('modalLocation').innerText = job.location;
   document.getElementById('modalSalary').innerText = job.salary || 'Competitive';
+  document.getElementById('modalExperience').innerText = job.experience || '4–6 Years Exp';
+  document.getElementById('modalPostedDate').innerText = `Posted: ${formatTimeAgo(job.postedDate) || 'Recent'}`;
   document.getElementById('modalMatchScore').innerText = `${job.matchScore}% Match (Rank #${job.rank || 1})`;
   document.getElementById('modalMatchedResume').innerText = job.matchedResume || 'PHP Developer Resume';
 
@@ -317,6 +319,16 @@ function openReviewById(id) {
     externalLink.style.display = 'inline-flex';
   } else {
     externalLink.style.display = 'none';
+  }
+
+  const recruiterLink = document.getElementById('modalRecruiterLink');
+  if (recruiterLink) {
+    if (job.recruiterPostUrl && job.recruiterPostUrl !== '#') {
+      recruiterLink.href = job.recruiterPostUrl;
+      recruiterLink.style.display = 'inline-flex';
+    } else {
+      recruiterLink.style.display = 'none';
+    }
   }
 
   const applyBtn = document.getElementById('approveApplyBtn');
@@ -503,4 +515,3 @@ function escapeHtml(str) {
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   })[m]);
 }
-
