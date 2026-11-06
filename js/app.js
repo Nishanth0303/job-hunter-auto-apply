@@ -5,12 +5,14 @@ let currentJob = null;
 let reviewModal = null;
 let settingsModal = null;
 let addJobModal = null;
+let skipReasonModal = null;
 let isGitHubPages = window.location.hostname.includes('github.io') || window.location.protocol === 'file:';
 
 document.addEventListener('DOMContentLoaded', () => {
   reviewModal = new bootstrap.Modal(document.getElementById('jobReviewModal'));
   settingsModal = new bootstrap.Modal(document.getElementById('settingsModal'));
   addJobModal = new bootstrap.Modal(document.getElementById('addJobModal'));
+  skipReasonModal = new bootstrap.Modal(document.getElementById('skipReasonModal'));
 
   loadJobs();
   loadSettings();
@@ -33,8 +35,31 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('copyCoverLetterBtn').addEventListener('click', copyCoverLetter);
   document.getElementById('searchInput').addEventListener('input', applyFiltersAndRender);
 
+  // Not Applying / Skip Reason flow
+  document.getElementById('notWillingToApplyBtn').addEventListener('click', () => {
+    if (!currentJob) return;
+    reviewModal.hide();
+    document.getElementById('customSkipReasonText').value = '';
+    document.getElementById('reason1').checked = true;
+    skipReasonModal.show();
+  });
+
+  document.getElementById('confirmSkipReasonBtn').addEventListener('click', handleConfirmSkipReason);
+
+  // Day-by-Day Report toggles
+  document.getElementById('viewDailyReportBtn').addEventListener('click', showDailyReport);
+  document.getElementById('backToTableBtn').addEventListener('click', showTableView);
+
+  // Reset skill highlight
+  document.getElementById('clearSkillHighlightBtn').addEventListener('click', () => {
+    if (currentJob) {
+      document.getElementById('modalDescription').innerText = currentJob.description || '';
+    }
+  });
+
   document.querySelectorAll('[data-filter]').forEach(btn => {
     btn.addEventListener('click', (e) => {
+      showTableView();
       document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
       e.target.classList.add('active');
       currentFilter = e.target.getAttribute('data-filter');
@@ -66,6 +91,7 @@ async function loadJobs() {
         if (savedStatus[j.id]) {
           j.status = savedStatus[j.id].status;
           j.appliedDate = savedStatus[j.id].appliedDate;
+          j.skipReason = savedStatus[j.id].skipReason || j.skipReason;
         }
       });
     }
@@ -79,6 +105,7 @@ async function loadJobs() {
     allJobs = jobsData;
     updateStats();
     applyFiltersAndRender();
+    renderDailyReportData();
   } catch (err) {
     console.error('Error loading jobs:', err);
   }
@@ -150,12 +177,74 @@ function updateStats() {
   const total = allJobs.length;
   const pending = allJobs.filter(j => j.status === 'pending').length;
   const applied = allJobs.filter(j => j.status === 'applied').length;
-  const avgMatch = total ? Math.round(allJobs.reduce((acc, j) => acc + (j.matchScore || 0), 0) / total) : 0;
+  const skipped = allJobs.filter(j => j.status === 'rejected').length;
 
   document.getElementById('statTotal').innerText = total;
   document.getElementById('statPending').innerText = pending;
   document.getElementById('statApplied').innerText = applied;
-  document.getElementById('statAvgMatch').innerText = avgMatch + '%';
+  document.getElementById('statSkipped').innerText = skipped;
+}
+
+function showTableView() {
+  document.getElementById('tableViewContainer').style.display = 'block';
+  document.getElementById('dailyReportContainer').style.display = 'none';
+}
+
+function showDailyReport() {
+  document.getElementById('tableViewContainer').style.display = 'none';
+  document.getElementById('dailyReportContainer').style.display = 'block';
+  renderDailyReportData();
+}
+
+function renderDailyReportData() {
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+  document.getElementById('reportDate').innerText = today;
+
+  const total = allJobs.length;
+  const applied = allJobs.filter(j => j.status === 'applied');
+  const pending = allJobs.filter(j => j.status === 'pending');
+  const skipped = allJobs.filter(j => j.status === 'rejected');
+
+  document.getElementById('reportDiscoveredCount').innerText = total;
+  document.getElementById('reportAppliedCount').innerText = applied.length;
+  document.getElementById('reportPendingCount').innerText = pending.length;
+  document.getElementById('reportSkippedCount').innerText = skipped.length;
+
+  const reasonsContainer = document.getElementById('skipReasonsBreakdown');
+  if (skipped.length === 0) {
+    reasonsContainer.innerHTML = '<span class="text-muted">No skipped jobs recorded yet today. All 20 jobs are active and ready for review.</span>';
+    return;
+  }
+
+  reasonsContainer.innerHTML = `
+    <div class="table-responsive">
+      <table class="table table-sm align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Role &amp; Company</th>
+            <th>Portal</th>
+            <th>Reason Stated For Not Applying</th>
+            <th class="text-end">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${skipped.map(j => `
+            <tr>
+              <td>
+                <strong>${escapeHtml(j.title)}</strong><br>
+                <small class="text-muted">${escapeHtml(j.company)} (${escapeHtml(j.location)})</small>
+              </td>
+              <td><span class="badge bg-light text-dark border">${escapeHtml(j.source)}</span></td>
+              <td><span class="text-danger fw-semibold">${escapeHtml(j.skipReason || 'No specific reason entered')}</span></td>
+              <td class="text-end">
+                <button class="btn btn-outline-primary btn-sm py-0" onclick="openReviewById('${j.id}')">Re-Review</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
 }
 
 function applyFiltersAndRender() {
@@ -163,9 +252,7 @@ function applyFiltersAndRender() {
   let filtered = allJobs;
 
   if (currentFilter !== 'all') {
-    filtered = filtered.filter(j => 
-      j.status === currentFilter
-    );
+    filtered = filtered.filter(j => j.status === currentFilter);
   }
 
   if (search) {
@@ -173,7 +260,8 @@ function applyFiltersAndRender() {
       (j.title && j.title.toLowerCase().includes(search)) ||
       (j.company && j.company.toLowerCase().includes(search)) ||
       (j.location && j.location.toLowerCase().includes(search)) ||
-      (j.source && j.source.toLowerCase().includes(search))
+      (j.source && j.source.toLowerCase().includes(search)) ||
+      (j.skipReason && j.skipReason.toLowerCase().includes(search))
     );
   }
 
@@ -200,7 +288,7 @@ function renderTable(jobs) {
       <tr>
         <td colspan="7" class="text-center py-5 text-muted">
           <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-          No jobs found under this view. Click <strong>"Scan Fresh Jobs"</strong> to discover new roles!
+          No jobs found under this view. Click <strong>"Scan Top 20 Jobs"</strong> to discover fresh openings!
         </td>
       </tr>
     `;
@@ -210,12 +298,13 @@ function renderTable(jobs) {
   tbody.innerHTML = jobs.map((job) => {
     const isPending = job.status === 'pending';
     const isApplied = job.status === 'applied';
+    const isSkipped = job.status === 'rejected';
 
     let statusBadge = `<span class="badge badge-status-pending"><i class="bi bi-clock-history me-1"></i>Pending Review</span>`;
     if (isApplied) {
       statusBadge = `<span class="badge badge-status-applied"><i class="bi bi-check-circle-fill me-1"></i>Applied</span>`;
-    } else if (job.status === 'rejected') {
-      statusBadge = `<span class="badge badge-status-rejected"><i class="bi bi-slash-circle me-1"></i>Dismissed</span>`;
+    } else if (isSkipped) {
+      statusBadge = `<span class="badge badge-status-rejected text-truncate d-inline-block" style="max-width: 170px;" title="${escapeHtml(job.skipReason || 'Not applying')}"><i class="bi bi-x-circle me-1"></i>Skipped: ${escapeHtml(job.skipReason || 'Dismissed')}</span>`;
     }
 
     const sourceBadge = getPortalBadge(job.source);
@@ -240,8 +329,11 @@ function renderTable(jobs) {
         </td>
         <td>
           <div class="fw-bold text-dark fs-6">${escapeHtml(job.title)}</div>
-          <div class="text-muted small d-flex align-items-center gap-2 mt-1">
-            <span><i class="bi bi-building me-1"></i>${escapeHtml(job.company)}</span>
+          <div class="text-muted small d-flex flex-wrap align-items-center gap-2 mt-1">
+            <span>
+              <i class="bi bi-building me-1"></i><strong>${escapeHtml(job.company)}</strong>
+              ${job.companyWebsite ? `<a href="${job.companyWebsite}" target="_blank" class="ms-1 text-primary text-decoration-none" title="Visit Company Website"><i class="bi bi-box-arrow-up-right" style="font-size:0.75rem;"></i></a>` : ''}
+            </span>
             <span>•</span>
             <span><i class="bi bi-geo-alt me-1"></i>${escapeHtml(job.location)}</span>
             ${job.salary ? `<span>•</span><span class="text-success fw-semibold">${escapeHtml(job.salary)}</span>` : ''}
@@ -272,7 +364,7 @@ function renderTable(jobs) {
               <button class="btn btn-success" onclick="approveAndApply('${job.id}')" title="Approve & Auto-Apply">
                 <i class="bi bi-send-check me-1"></i>Apply
               </button>
-              <button class="btn btn-outline-secondary" onclick="dismissJob('${job.id}')" title="Dismiss">
+              <button class="btn btn-outline-danger" onclick="promptSkipReason('${job.id}')" title="Not Willing to Apply">
                 <i class="bi bi-x-lg"></i>
               </button>
             ` : ''}
@@ -293,12 +385,26 @@ function openReviewById(id) {
 
   document.getElementById('modalJobTitle').innerText = job.title;
   document.getElementById('modalCompany').innerText = job.company;
+  document.getElementById('modalCompanyName').innerText = job.company;
   document.getElementById('modalLocation').innerText = job.location;
   document.getElementById('modalSalary').innerText = job.salary || 'Competitive';
   document.getElementById('modalExperience').innerText = job.experience || '4–6 Years Exp';
   document.getElementById('modalPostedDate').innerText = `Posted: ${formatTimeAgo(job.postedDate) || 'Recent'}`;
   document.getElementById('modalMatchScore').innerText = `${job.matchScore}% Match (Rank #${job.rank || 1})`;
   document.getElementById('modalMatchedResume').innerText = job.matchedResume || 'PHP Developer Resume';
+
+  // Company details & website
+  const companyWebsite = document.getElementById('modalCompanyWebsite');
+  if (job.companyWebsite) {
+    companyWebsite.href = job.companyWebsite;
+    companyWebsite.style.display = 'inline-flex';
+  } else {
+    companyWebsite.style.display = 'none';
+  }
+  document.getElementById('modalCompanyDetails').innerText = job.companyDetails || `${job.company} is an active technology employer hiring for software development roles.`;
+
+  // Matched and Unmatched Skills Badges (Click to highlight in JD)
+  renderSkillInspector(job);
 
   const portfolioLink = document.getElementById('modalPortfolioLink');
   if (job.portfolioUrl) {
@@ -310,7 +416,6 @@ function openReviewById(id) {
 
   document.getElementById('modalDescription').innerText = job.description || 'No detailed description available.';
   document.getElementById('modalFitReason').innerText = job.fitReason || 'High match with target skillset.';
-  document.getElementById('modalGaps').innerText = job.gaps || 'None significant.';
   document.getElementById('modalCoverLetter').value = job.coverNote || '';
 
   const externalLink = document.getElementById('modalJobLink');
@@ -345,16 +450,99 @@ function openReviewById(id) {
   reviewModal.show();
 }
 
+// Render interactive skill badges that highlight words in JD
+function renderSkillInspector(job) {
+  const matchedSkills = job.matchedSkills || ["PHP", "Laravel", "MySQL", "REST APIs"];
+  const unmatchedSkills = job.unmatchedSkills || (job.gaps ? [job.gaps] : ["None"]);
+
+  const matchedContainer = document.getElementById('modalMatchedSkillsBadges');
+  matchedContainer.innerHTML = matchedSkills.map(skill => `
+    <span class="badge bg-success-subtle text-success border border-success-subtle me-1 mb-1 skill-pill" onclick="highlightSkillInJD('${escapeHtml(skill)}', true)" title="Click to highlight in JD">
+      <i class="bi bi-check me-1"></i>${escapeHtml(skill)}
+    </span>
+  `).join('');
+
+  const unmatchedContainer = document.getElementById('modalUnmatchedSkillsBadges');
+  unmatchedContainer.innerHTML = unmatchedSkills.map(skill => `
+    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle me-1 mb-1 skill-pill" onclick="highlightSkillInJD('${escapeHtml(skill)}', false)" title="Click to highlight in JD">
+      <i class="bi bi-exclamation me-1"></i>${escapeHtml(skill)}
+    </span>
+  `).join('');
+}
+
+function highlightSkillInJD(skillName, isMatch) {
+  if (!currentJob) return;
+  const descEl = document.getElementById('modalDescription');
+  const rawText = currentJob.description || '';
+  
+  if (!skillName || skillName === "None") return;
+
+  const regex = new RegExp(`(${escapeRegExp(skillName)})`, 'gi');
+  const highlightClass = isMatch ? 'skill-highlight-match' : 'skill-highlight-gap';
+  const highlighted = rawText.replace(regex, `<mark class="${highlightClass}">$1</mark>`);
+  
+  descEl.innerHTML = highlighted;
+}
+
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Prompt Not Applying / Skip Reason
+function promptSkipReason(id) {
+  const job = allJobs.find(j => j.id === id);
+  if (!job) return;
+  currentJob = job;
+  document.getElementById('customSkipReasonText').value = '';
+  document.getElementById('reason1').checked = true;
+  skipReasonModal.show();
+}
+
+function handleConfirmSkipReason() {
+  if (!currentJob) return;
+
+  const selectedRadio = document.querySelector('input[name="skipReasonRadio"]:checked');
+  let reason = selectedRadio ? selectedRadio.value : 'Salary too low or not disclosed';
+  const customText = document.getElementById('customSkipReasonText').value.trim();
+
+  if (selectedRadio && selectedRadio.value === 'other') {
+    reason = customText || 'Custom reason specified by candidate';
+  } else if (customText) {
+    reason = `${reason} — ${customText}`;
+  }
+
+  currentJob.status = 'rejected';
+  currentJob.skipReason = reason;
+
+  // Persist to localStorage
+  const saved = JSON.parse(localStorage.getItem('job_status_overrides') || '{}');
+  saved[currentJob.id] = { status: 'rejected', skipReason: reason };
+  localStorage.setItem('job_status_overrides', JSON.stringify(saved));
+
+  if (!isGitHubPages) {
+    try {
+      fetch(`/api/jobs/reject/${currentJob.id}`, { method: 'POST' });
+    } catch (e) {}
+  }
+
+  skipReasonModal.hide();
+  showToast(`Recorded skip reason for ${currentJob.title}: "${reason}"`);
+  updateStats();
+  applyFiltersAndRender();
+  renderDailyReportData();
+}
+
 async function approveAndApply(id) {
   const job = allJobs.find(j => j.id === id);
   if (!job) return;
 
   job.status = 'applied';
   job.appliedDate = new Date().toISOString();
+  job.skipReason = null;
 
   // Save to localStorage
   const saved = JSON.parse(localStorage.getItem('job_status_overrides') || '{}');
-  saved[id] = { status: 'applied', appliedDate: job.appliedDate };
+  saved[id] = { status: 'applied', appliedDate: job.appliedDate, skipReason: null };
   localStorage.setItem('job_status_overrides', JSON.stringify(saved));
 
   if (!isGitHubPages) {
@@ -366,34 +554,13 @@ async function approveAndApply(id) {
   showToast(`Applied for ${job.title} at ${job.company}!`);
   updateStats();
   applyFiltersAndRender();
+  renderDailyReportData();
 }
 
 async function approveAndApplyCurrent() {
   if (!currentJob) return;
   await approveAndApply(currentJob.id);
   reviewModal.hide();
-}
-
-async function dismissJob(id) {
-  if (!confirm('Dismiss this job listing?')) return;
-  const job = allJobs.find(j => j.id === id);
-  if (!job) return;
-
-  job.status = 'rejected';
-
-  const saved = JSON.parse(localStorage.getItem('job_status_overrides') || '{}');
-  saved[id] = { status: 'rejected' };
-  localStorage.setItem('job_status_overrides', JSON.stringify(saved));
-
-  if (!isGitHubPages) {
-    try {
-      await fetch(`/api/jobs/reject/${id}`, { method: 'POST' });
-    } catch (e) {}
-  }
-
-  showToast(`Dismissed ${job.title}`);
-  updateStats();
-  applyFiltersAndRender();
 }
 
 async function scanNewJobs() {
@@ -413,14 +580,13 @@ async function scanNewJobs() {
       }
     }
 
-    // Client-side simulation on GitHub Pages
     showToast('Refreshed Top 20 ranked jobs across Naukri, LinkedIn, Instahyre, Cutshort & Foundit!');
     await loadJobs();
   } catch (err) {
     alert('Scan error: ' + err.message);
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<i class="bi bi-search me-2"></i>Scan Top 20 Jobs Now';
+    btn.innerHTML = '<i class="bi bi-search me-2"></i>Scan Top 20 Jobs';
   }
 }
 
@@ -429,7 +595,7 @@ async function sendEmailSimulation(jobId) {
   const baseUrl = 'https://nishanth0303.github.io/job-hunter-auto-apply';
   const reviewLink = `${baseUrl}/?review=${job ? job.id : ''}`;
 
-  alert(`📧 EMAIL NOTIFICATION DISPATCHED\n\nTo: r.nishanth2004@gmail.com\nSubject: 🎯 Top Match #${job.rank}: ${job.title} at ${job.company} (${job.matchScore}% Match on ${job.source})\n\nDirect Review Link:\n${reviewLink}\n\n(Clicking this opens your live GitHub Pages dashboard directly to this job's review modal!)`);
+  alert(`📧 EMAIL NOTIFICATION DISPATCHED\n\nTo: r.nishanth2004@gmail.com\nSubject: 🎯 Top Match #${job.rank}: ${job.title} at ${job.company} (${job.matchScore}% Match on ${job.source})\n\nDirect Review Link:\n${reviewLink}\n\n(Clicking this opens your live dashboard directly to this job's review modal!)`);
 }
 
 async function saveManualJob() {
@@ -449,16 +615,20 @@ async function saveManualJob() {
   const newJob = {
     id: 'job-manual-' + Date.now(),
     title, company, location: location || 'Coimbatore, Tamil Nadu',
+    companyWebsite: `https://www.google.com/search?q=${encodeURIComponent(company + " Coimbatore official website")}`,
+    companyDetails: `${company} is a hiring organization for technology and software roles.`,
     salary: salary || '₹10,00,000 / yr',
     matchScore,
     status: 'pending',
     appliedDate: null,
+    skipReason: null,
     applyUrl: applyUrl || '#',
     source: 'Direct Portal',
     postedDate: new Date().toISOString(),
     description: description || 'Custom tracked job position.',
+    matchedSkills: ["PHP", "Laravel", "MySQL"],
+    unmatchedSkills: ["None noted"],
     fitReason: 'Manual tracked job matching your 5 years PHP/Laravel experience.',
-    gaps: 'None noted.',
     matchedResume: 'PHP Developer Resume',
     portfolioUrl: 'https://nishanth0303.github.io/Nishanth-portfolio/php-dev.html',
     coverNote: `Dear ${company} Hiring Team,\n\nI am writing to apply for the ${title} position. With 5 years of experience in PHP, Laravel 10, CodeIgniter, and MySQL, I am eager to contribute.\n\nBest regards,\nNishanth R\nPhone: +91 8220607076\nEmail: r.nishanth2004@gmail.com`
@@ -472,6 +642,7 @@ async function saveManualJob() {
   showToast('New job tracked on dashboard!');
   updateStats();
   applyFiltersAndRender();
+  renderDailyReportData();
 }
 
 function copyCoverLetter() {

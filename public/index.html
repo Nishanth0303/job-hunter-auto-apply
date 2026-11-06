@@ -11,6 +11,13 @@
   
   <!-- Custom Styling -->
   <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .skill-pill { cursor: pointer; transition: all 0.15s ease; user-select: none; }
+    .skill-pill:hover { transform: scale(1.05); }
+    .skill-highlight-match { background-color: #d1e7dd !important; color: #0f5132 !important; font-weight: bold; padding: 2px 4px; border-radius: 4px; }
+    .skill-highlight-gap { background-color: #fff3cd !important; color: #664d03 !important; font-weight: bold; padding: 2px 4px; border-radius: 4px; }
+    .company-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; }
+  </style>
 </head>
 <body>
 
@@ -57,28 +64,28 @@
           <span>Top 8 India Portals (Coimbatore / Chennai / Bangalore / Remote):</span>
         </div>
         <div class="d-flex flex-wrap align-items-center gap-2">
-          <a href="https://www.naukri.com/" target="_blank" class="badge badge-portal badge-naukri portal-pill">
+          <a href="https://www.naukri.com/php-developer-jobs" target="_blank" class="badge badge-portal badge-naukri portal-pill">
             <i class="bi bi-briefcase-fill"></i> Naukri (Must Use)
           </a>
-          <a href="https://www.linkedin.com/jobs/" target="_blank" class="badge badge-portal badge-linkedin portal-pill">
+          <a href="https://www.linkedin.com/jobs/search/?keywords=PHP+Developer&location=India" target="_blank" class="badge badge-portal badge-linkedin portal-pill">
             <i class="bi bi-linkedin"></i> LinkedIn
           </a>
           <a href="https://www.instahyre.com/" target="_blank" class="badge badge-portal badge-instahyre portal-pill">
             <i class="bi bi-lightning-charge-fill"></i> Instahyre
           </a>
-          <a href="https://cutshort.io/" target="_blank" class="badge badge-portal badge-cutshort portal-pill">
+          <a href="https://cutshort.io/jobs/php-laravel-symfony-jobs-in-chennai" target="_blank" class="badge badge-portal badge-cutshort portal-pill">
             <i class="bi bi-code-slash"></i> Cutshort
           </a>
-          <a href="https://www.foundit.in/" target="_blank" class="badge badge-portal badge-foundit portal-pill">
+          <a href="https://www.foundit.in/search/php-jobs" target="_blank" class="badge badge-portal badge-foundit portal-pill">
             <i class="bi bi-search"></i> Foundit
           </a>
-          <a href="https://in.indeed.com/" target="_blank" class="badge badge-portal badge-indeed portal-pill">
+          <a href="https://in.indeed.com/q-php-%26-laravel-developer-l-tamil-nadu-jobs.html" target="_blank" class="badge badge-portal badge-indeed portal-pill">
             <i class="bi bi-check2-circle"></i> Indeed
           </a>
-          <a href="https://www.hirist.tech/" target="_blank" class="badge badge-portal badge-hirist portal-pill">
+          <a href="https://www.hirist.tech/j/php-developer-laravel-codeigniter-1637097?jobPos=3" target="_blank" class="badge badge-portal badge-hirist portal-pill">
             <i class="bi bi-stars"></i> Hirist
           </a>
-          <a href="https://wellfound.com/" target="_blank" class="badge badge-portal badge-wellfound portal-pill">
+          <a href="https://wellfound.com/jobs/4092860-laravel-developer" target="_blank" class="badge badge-portal badge-wellfound portal-pill">
             <i class="bi bi-peace"></i> Wellfound
           </a>
         </div>
@@ -137,18 +144,18 @@
         <div class="card stat-card">
           <div class="d-flex align-items-center justify-content-between">
             <div>
-              <div class="text-muted small fw-semibold text-uppercase">Top Match Rate</div>
-              <div class="stat-number mt-1 text-info" id="statAvgMatch">98%</div>
+              <div class="text-muted small fw-semibold text-uppercase">Skipped / Reasons</div>
+              <div class="stat-number mt-1 text-secondary" id="statSkipped">0</div>
             </div>
             <div class="stat-icon info">
-              <i class="bi bi-graph-up-arrow"></i>
+              <i class="bi bi-x-octagon-fill"></i>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Main Card with Table -->
+    <!-- Main Card with Table & Day-by-Day Report -->
     <div class="card">
       <div class="card-header bg-white border-bottom py-3">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
@@ -158,7 +165,10 @@
             <button type="button" class="btn btn-outline-secondary btn-sm active" data-filter="all">All Top 20</button>
             <button type="button" class="btn btn-outline-secondary btn-sm" data-filter="pending">Pending Review</button>
             <button type="button" class="btn btn-outline-secondary btn-sm" data-filter="applied">Applied</button>
-            <button type="button" class="btn btn-outline-secondary btn-sm" data-filter="rejected">Dismissed</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-filter="rejected">Skipped (With Reasons)</button>
+            <button type="button" class="btn btn-outline-primary btn-sm" id="viewDailyReportBtn">
+              <i class="bi bi-calendar3 me-1"></i>Day-by-Day Report
+            </button>
           </div>
 
           <!-- Search & Actions -->
@@ -177,18 +187,18 @@
         </div>
       </div>
 
-      <!-- Table (Ranked Order) -->
-      <div class="table-responsive">
+      <!-- Table View -->
+      <div class="table-responsive" id="tableViewContainer">
         <table class="table table-hover align-middle mb-0">
           <thead class="table-light">
             <tr>
               <th scope="col" class="text-center" style="width: 5%;">Rank</th>
-              <th scope="col" style="width: 33%;">Job Title, Company &amp; Suggested Resume</th>
-              <th scope="col" style="width: 15%;">CV Match</th>
+              <th scope="col" style="width: 32%;">Job Title, Company &amp; Website</th>
+              <th scope="col" style="width: 14%;">CV Match</th>
               <th scope="col" style="width: 14%;">Portal &amp; Date</th>
-              <th scope="col" style="width: 12%;">Status</th>
+              <th scope="col" style="width: 13%;">Status &amp; Skip Reason</th>
               <th scope="col" style="width: 9%;">Applied On</th>
-              <th scope="col" class="text-end" style="width: 12%;">Actions</th>
+              <th scope="col" class="text-end" style="width: 13%;">Actions</th>
             </tr>
           </thead>
           <tbody id="jobsTableBody">
@@ -196,11 +206,65 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Day-by-Day Report View (Initially Hidden) -->
+      <div class="p-4" id="dailyReportContainer" style="display: none;">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h5 class="fw-bold mb-1"><i class="bi bi-calendar-check me-2 text-primary"></i>Day-by-Day Tracking &amp; Application Report</h5>
+            <p class="text-muted small mb-0">Comprehensive daily breakdown of discovered, applied, and skipped jobs with your recorded reasons.</p>
+          </div>
+          <button class="btn btn-outline-secondary btn-sm" id="backToTableBtn">
+            <i class="bi bi-arrow-left me-1"></i>Back to Jobs Table
+          </button>
+        </div>
+
+        <div class="card border mb-3">
+          <div class="card-header bg-light d-flex align-items-center justify-content-between py-2">
+            <span class="fw-bold text-dark"><i class="bi bi-calendar-event me-2"></i>Today's Report — <span id="reportDate">Today</span></span>
+            <span class="badge bg-primary">20 Jobs Discovered</span>
+          </div>
+          <div class="card-body">
+            <div class="row g-3 mb-3">
+              <div class="col-md-3">
+                <div class="p-3 bg-light rounded text-center">
+                  <div class="small text-muted text-uppercase fw-semibold">Discovered</div>
+                  <div class="fs-4 fw-bold text-primary mt-1" id="reportDiscoveredCount">20</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="p-3 bg-success-subtle rounded text-center">
+                  <div class="small text-success text-uppercase fw-semibold">Applied</div>
+                  <div class="fs-4 fw-bold text-success mt-1" id="reportAppliedCount">0</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="p-3 bg-warning-subtle rounded text-center">
+                  <div class="small text-warning-emphasis text-uppercase fw-semibold">Pending</div>
+                  <div class="fs-4 fw-bold text-warning mt-1" id="reportPendingCount">20</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="p-3 bg-danger-subtle rounded text-center">
+                  <div class="small text-danger text-uppercase fw-semibold">Skipped (Not Applied)</div>
+                  <div class="fs-4 fw-bold text-danger mt-1" id="reportSkippedCount">0</div>
+                </div>
+              </div>
+            </div>
+
+            <h6 class="fw-bold mb-2">Detailed Skip Reasons Breakdown:</h6>
+            <div id="skipReasonsBreakdown" class="p-3 bg-light rounded small text-secondary">
+              No skipped jobs yet today. When you skip a job, your chosen reason and notes will appear here.
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </div>
 
-  <!-- MODAL: Job Review & Auto-Apply -->
+  <!-- MODAL: Job Review & Auto-Apply with Skill Highlighting & Company Details -->
   <div class="modal fade" id="jobReviewModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
       <div class="modal-content">
@@ -224,7 +288,21 @@
         </div>
 
         <div class="modal-body">
-          <!-- Tailored Resume Match Banner -->
+          <!-- Company Website & Overview Card -->
+          <div class="company-card mb-3">
+            <div class="d-flex align-items-center justify-content-between mb-1">
+              <div class="fw-bold text-dark fs-6 d-flex align-items-center gap-2">
+                <i class="bi bi-building-check text-primary"></i>
+                <span id="modalCompanyName">Company Name</span>
+              </div>
+              <a href="#" target="_blank" class="btn btn-outline-primary btn-sm py-0 px-2" id="modalCompanyWebsite">
+                <i class="bi bi-box-arrow-up-right me-1"></i>Official Website
+              </a>
+            </div>
+            <p class="small text-muted mb-0" id="modalCompanyDetails">Company overview and business details.</p>
+          </div>
+
+          <!-- Suggested Resume Variant -->
           <div class="d-flex align-items-center justify-content-between p-2 mb-3 bg-white border rounded shadow-sm">
             <div class="d-flex align-items-center gap-2">
               <span class="badge bg-primary-subtle text-primary border border-primary-subtle"><i class="bi bi-file-earmark-person me-1"></i>Suggested Resume</span>
@@ -235,25 +313,35 @@
             </a>
           </div>
 
+          <!-- Interactive Skill Highlighter Bar -->
+          <div class="card p-3 mb-3 border">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-stars me-1 text-warning"></i>Skills Match Inspector (Click to highlight in JD)</h6>
+              <button class="btn btn-link btn-sm p-0 text-decoration-none" id="clearSkillHighlightBtn">Reset Highlights</button>
+            </div>
+            <div class="mb-2">
+              <span class="small fw-semibold text-success me-2"><i class="bi bi-check-circle-fill me-1"></i>Matched:</span>
+              <span id="modalMatchedSkillsBadges"></span>
+            </div>
+            <div>
+              <span class="small fw-semibold text-warning me-2"><i class="bi bi-exclamation-triangle-fill me-1"></i>Gaps / Missing:</span>
+              <span id="modalUnmatchedSkillsBadges"></span>
+            </div>
+          </div>
+
+          <!-- Job Description (Text with Highlight Support) -->
+          <div class="mb-4">
+            <h6 class="fw-bold text-dark mb-2">Job Description</h6>
+            <div class="p-3 bg-light rounded text-secondary small" id="modalDescription" style="max-height: 180px; overflow-y: auto; line-height: 1.6;"></div>
+          </div>
+
           <!-- Why You Fit -->
           <div class="alert fit-alert p-3 mb-3">
             <h6 class="fw-bold text-success mb-1"><i class="bi bi-check-circle-fill me-2"></i>Why You Fit This Role</h6>
             <p class="small mb-0 text-dark" id="modalFitReason"></p>
           </div>
 
-          <!-- Gaps -->
-          <div class="alert gap-alert p-3 mb-3">
-            <h6 class="fw-bold text-warning mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>Skill Gaps Identified</h6>
-            <p class="small mb-0 text-dark" id="modalGaps"></p>
-          </div>
-
-          <!-- Job Description -->
-          <div class="mb-4">
-            <h6 class="fw-bold text-dark mb-2">Job Description</h6>
-            <div class="p-3 bg-light rounded text-secondary small" id="modalDescription" style="max-height: 180px; overflow-y: auto;"></div>
-          </div>
-
-          <!-- Cover Note -->
+          <!-- Tailored Cover Letter -->
           <div>
             <div class="d-flex align-items-center justify-content-between mb-2">
               <h6 class="fw-bold text-dark mb-0">Tailored Cover Letter (Nishanth R)</h6>
@@ -276,11 +364,64 @@
             </a>
           </div>
           <div class="d-flex gap-2">
-            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-outline-danger" id="notWillingToApplyBtn">
+              <i class="bi bi-x-circle me-1"></i>Not Applying (Give Reason)
+            </button>
             <button type="button" class="btn btn-success" id="approveApplyBtn">
               <i class="bi bi-send-check me-1"></i>Approve &amp; Auto-Apply
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Not Applying / Skip Reason Input -->
+  <div class="modal fade" id="skipReasonModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header border-bottom">
+          <h5 class="modal-title fw-bold text-danger"><i class="bi bi-question-circle me-2"></i>Why are you not applying?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p class="small text-muted mb-3">Recording your reason helps track your job search analytics and avoids suggesting similar mismatched roles in your daily report.</p>
+
+          <!-- Pre-set options -->
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="skipReasonRadio" id="reason1" value="Salary too low or not disclosed" checked>
+            <label class="form-check-label small" for="reason1">💰 Salary too low / not disclosed</label>
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="skipReasonRadio" id="reason2" value="Location or daily commute not suitable">
+            <label class="form-check-label small" for="reason2">📍 Location / daily commute not suitable</label>
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="skipReasonRadio" id="reason3" value="Requires skills I don't have or prefer not to use">
+            <label class="form-check-label small" for="reason3">⚙️ Requires skills I don't have/want (e.g. Heavy Python/AWS)</label>
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="skipReasonRadio" id="reason4" value="Company culture or negative reviews">
+            <label class="form-check-label small" for="reason4">🏢 Company culture or negative reviews</label>
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="skipReasonRadio" id="reason5" value="Unfavorable bond or notice period requirements">
+            <label class="form-check-label small" for="reason5">⏳ Unfavorable bond / strict notice period requirements</label>
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="radio" name="skipReasonRadio" id="reasonOther" value="other">
+            <label class="form-check-label small" for="reasonOther">✍️ Other custom reason (specify below)</label>
+          </div>
+
+          <!-- Custom Text Input -->
+          <div class="mb-2">
+            <label class="form-label small fw-semibold">Custom Note / Specific Reason (Optional or when choosing Other):</label>
+            <textarea class="form-control" id="customSkipReasonText" rows="3" placeholder="e.g. Position requires immediate joining in 15 days, or on-site 6 days a week..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer border-top">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmSkipReasonBtn">Confirm &amp; Save Reason</button>
         </div>
       </div>
     </div>
@@ -361,7 +502,7 @@
           </div>
           <div class="mb-3">
             <label class="form-label fw-semibold">Company *</label>
-            <input type="text" class="form-control" id="manualCompany" placeholder="e.g. Zoho Partner Firm" required />
+            <input type="text" class="form-control" id="manualCompany" placeholder="e.g. Cloudi5 Technologies" required />
           </div>
           <div class="row g-2 mb-3">
             <div class="col-6">
