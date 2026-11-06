@@ -153,6 +153,27 @@ const server = http.createServer(async (req, res) => {
       });
     }
 
+    // 4b. POST /api/jobs/reset/:id (Reset Job Status back to pending)
+    if (pathname.startsWith('/api/jobs/reset/') && method === 'POST') {
+      const id = pathname.replace('/api/jobs/reset/', '');
+      const jobs = readJSON(JOBS_FILE, []);
+      const job = jobs.find(j => j.id === id);
+      if (!job) {
+        return sendJSON(res, 404, { success: false, message: 'Job not found' });
+      }
+
+      job.status = 'pending';
+      job.appliedDate = null;
+      job.skipReason = null;
+      writeJSON(JOBS_FILE, jobs);
+
+      return sendJSON(res, 200, {
+        success: true,
+        message: `Reset ${job.title} to pending`,
+        job
+      });
+    }
+
     // 5. POST /api/jobs/scan (Scan fresh jobs based on CV & Target Roles)
     if (pathname === '/api/jobs/scan' && method === 'POST') {
       const config = readJSON(CONFIG_FILE, {});

@@ -6,6 +6,7 @@ let reviewModal = null;
 let settingsModal = null;
 let addJobModal = null;
 let skipReasonModal = null;
+let applyConfirmModal = null;
 let isGitHubPages = window.location.hostname.includes('github.io') || window.location.protocol === 'file:';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -13,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   settingsModal = new bootstrap.Modal(document.getElementById('settingsModal'));
   addJobModal = new bootstrap.Modal(document.getElementById('addJobModal'));
   skipReasonModal = new bootstrap.Modal(document.getElementById('skipReasonModal'));
+  applyConfirmModal = new bootstrap.Modal(document.getElementById('applyConfirmModal'));
 
   loadJobs();
   loadSettings();
@@ -34,6 +36,27 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('approveApplyBtn').addEventListener('click', approveAndApplyCurrent);
   document.getElementById('copyCoverLetterBtn').addEventListener('click', copyCoverLetter);
   document.getElementById('searchInput').addEventListener('input', applyFiltersAndRender);
+
+  // Application Confirmation Modal Listeners
+  document.getElementById('confirmSubmittedBtn').addEventListener('click', handleConfirmSubmitted);
+  document.getElementById('confirmDidNotApplyBtn').addEventListener('click', () => {
+    applyConfirmModal.hide();
+    if (currentJob) promptSkipReason(currentJob.id);
+  });
+
+  // Modal Reset button
+  const modalResetBtn = document.getElementById('modalResetBtn');
+  if (modalResetBtn) {
+    modalResetBtn.addEventListener('click', () => {
+      if (currentJob) resetJobStatus(currentJob.id);
+    });
+  }
+
+  // Settings Reset All button
+  const resetAllOverridesBtn = document.getElementById('resetAllOverridesBtn');
+  if (resetAllOverridesBtn) {
+    resetAllOverridesBtn.addEventListener('click', resetAllOverrides);
+  }
 
   // Not Applying / Skip Reason flow
   document.getElementById('notWillingToApplyBtn').addEventListener('click', () => {
@@ -361,13 +384,20 @@ function renderTable(jobs) {
               <i class="bi bi-eye me-1"></i>Review
             </button>
             ${isPending ? `
-              <button class="btn btn-success" onclick="approveAndApply('${job.id}')" title="Approve & Auto-Apply">
-                <i class="bi bi-send-check me-1"></i>Apply
+              <button class="btn btn-success fw-semibold" onclick="startPortalApply('${job.id}')" title="Open Exact Post & Auto-Apply">
+                <i class="bi bi-box-arrow-up-right me-1"></i>Apply
               </button>
               <button class="btn btn-outline-danger" onclick="promptSkipReason('${job.id}')" title="Not Willing to Apply">
                 <i class="bi bi-x-lg"></i>
               </button>
-            ` : ''}
+            ` : `
+              <a href="${job.applyUrl}" target="_blank" class="btn btn-outline-success" title="Open Exact Job Post Page">
+                <i class="bi bi-box-arrow-up-right"></i>
+              </a>
+              <button class="btn btn-outline-secondary" onclick="resetJobStatus('${job.id}')" title="Reset back to Pending Review">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </button>
+            `}
             <button class="btn btn-outline-info" onclick="sendEmailSimulation('${job.id}')" title="Email Alert Preview">
               <i class="bi bi-envelope"></i>
             </button>
@@ -437,14 +467,28 @@ function openReviewById(id) {
   }
 
   const applyBtn = document.getElementById('approveApplyBtn');
+  const modalResetBtn = document.getElementById('modalResetBtn');
+  const portalNameSpan = document.getElementById('modalApplyBtnPortalName');
+  if (portalNameSpan) portalNameSpan.innerText = job.source || 'Portal';
+
   if (job.status === 'applied') {
-    applyBtn.className = 'btn btn-secondary disabled';
-    applyBtn.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>Already Applied';
-    applyBtn.disabled = true;
-  } else {
-    applyBtn.className = 'btn btn-success';
-    applyBtn.innerHTML = '<i class="bi bi-send-check me-1"></i>Approve & Auto-Apply';
+    applyBtn.className = 'btn btn-outline-success';
+    applyBtn.innerHTML = `<i class="bi bi-box-arrow-up-right me-1"></i>Re-open on ${escapeHtml(job.source || 'Portal')}`;
     applyBtn.disabled = false;
+    applyBtn.onclick = () => window.open(job.applyUrl, '_blank');
+    if (modalResetBtn) modalResetBtn.style.display = 'inline-flex';
+  } else if (job.status === 'rejected') {
+    applyBtn.className = 'btn btn-secondary';
+    applyBtn.innerHTML = `<i class="bi bi-x-circle me-1"></i>Skipped`;
+    applyBtn.disabled = true;
+    applyBtn.onclick = null;
+    if (modalResetBtn) modalResetBtn.style.display = 'inline-flex';
+  } else {
+    applyBtn.className = 'btn btn-success fw-bold';
+    applyBtn.innerHTML = `<i class="bi bi-box-arrow-up-right me-1"></i>🚀 Open &amp; Apply on ${escapeHtml(job.source || 'Portal')}`;
+    applyBtn.disabled = false;
+    applyBtn.onclick = approveAndApplyCurrent;
+    if (modalResetBtn) modalResetBtn.style.display = 'none';
   }
 
   reviewModal.show();
@@ -532,35 +576,111 @@ function handleConfirmSkipReason() {
   renderDailyReportData();
 }
 
-async function approveAndApply(id) {
+// Start Portal Apply: Copies tailored cover letter, opens exact post page in new tab, and prompts verification
+async function startPortalApply(id) {
   const job = allJobs.find(j => j.id === id);
   if (!job) return;
+  currentJob = job;
 
-  job.status = 'applied';
-  job.appliedDate = new Date().toISOString();
-  job.skipReason = null;
+  // 1. Copy customized cover note to clipboard
+  try {
+    await navigator.clipboard.writeText(job.coverNote || '');
+  } catch (err) {}
+
+  // 2. Open exact direct vacancy post page in new tab
+  if (job.applyUrl && job.applyUrl !== '#') {
+    window.open(job.applyUrl, '_blank');
+  }
+
+  // 3. Populate and show verification modal
+  const portalName = job.source || 'Portal';
+  document.getElementById('confirmPortalName').innerText = portalName;
+  document.getElementById('confirmPortalNameText').innerText = portalName;
+  document.getElementById('confirmJobTitle').innerText = job.title;
+  document.getElementById('confirmCompany').innerText = job.company;
+  document.getElementById('reopenPortalLink').href = job.applyUrl;
+
+  applyConfirmModal.show();
+}
+
+async function approveAndApplyCurrent() {
+  if (!currentJob) return;
+  reviewModal.hide();
+  await startPortalApply(currentJob.id);
+}
+
+// User confirms they have submitted application on portal
+async function handleConfirmSubmitted() {
+  if (!currentJob) return;
+
+  currentJob.status = 'applied';
+  currentJob.appliedDate = new Date().toISOString();
+  currentJob.skipReason = null;
 
   // Save to localStorage
   const saved = JSON.parse(localStorage.getItem('job_status_overrides') || '{}');
-  saved[id] = { status: 'applied', appliedDate: job.appliedDate, skipReason: null };
+  saved[currentJob.id] = { status: 'applied', appliedDate: currentJob.appliedDate, skipReason: null };
   localStorage.setItem('job_status_overrides', JSON.stringify(saved));
 
   if (!isGitHubPages) {
     try {
-      await fetch(`/api/jobs/approve/${id}`, { method: 'POST' });
+      await fetch(`/api/jobs/approve/${currentJob.id}`, { method: 'POST' });
     } catch (e) {}
   }
 
-  showToast(`Applied for ${job.title} at ${job.company}!`);
+  applyConfirmModal.hide();
+  showToast(`✅ Confirmed! Applied for ${currentJob.title} at ${currentJob.company} on ${currentJob.source}!`);
   updateStats();
   applyFiltersAndRender();
   renderDailyReportData();
 }
 
-async function approveAndApplyCurrent() {
-  if (!currentJob) return;
-  await approveAndApply(currentJob.id);
-  reviewModal.hide();
+// Reset any job back to Pending Review
+async function resetJobStatus(id) {
+  const job = allJobs.find(j => j.id === id);
+  if (!job) return;
+
+  job.status = 'pending';
+  job.appliedDate = null;
+  job.skipReason = null;
+
+  // Remove from localStorage
+  const saved = JSON.parse(localStorage.getItem('job_status_overrides') || '{}');
+  delete saved[id];
+  localStorage.setItem('job_status_overrides', JSON.stringify(saved));
+
+  if (!isGitHubPages) {
+    try {
+      await fetch(`/api/jobs/reset/${id}`, { method: 'POST' });
+    } catch (e) {}
+  }
+
+  showToast(`↩️ Reset ${job.title} at ${job.company} back to Pending Review!`);
+  updateStats();
+  applyFiltersAndRender();
+  renderDailyReportData();
+
+  // If modal is open for this job, refresh its view
+  if (currentJob && currentJob.id === id) {
+    openReviewById(id);
+  }
+}
+
+// Reset all overrides in settings
+function resetAllOverrides() {
+  if (confirm("Are you sure you want to reset ALL 20 job statuses back to Pending Review?")) {
+    localStorage.removeItem('job_status_overrides');
+    allJobs.forEach(j => {
+      j.status = 'pending';
+      j.appliedDate = null;
+      j.skipReason = null;
+    });
+    settingsModal.hide();
+    showToast("🧹 All job statuses have been reset back to Pending Review!");
+    updateStats();
+    applyFiltersAndRender();
+    renderDailyReportData();
+  }
 }
 
 async function scanNewJobs() {

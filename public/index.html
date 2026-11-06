@@ -94,7 +94,27 @@
   </div>
 
   <!-- Main Container -->
-  <div class="container-fluid px-4 py-4">
+  <div class="container-fluid px-4 py-3">
+
+    <!-- Chrome Auto-Apply & Bookmarklet Helper Bar -->
+    <div class="card mb-3 border bg-white shadow-sm">
+      <div class="card-body p-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-3">
+          <span class="badge bg-dark fs-6 py-2 px-3"><i class="bi bi-lightning-charge-fill text-warning me-1"></i>1-Click Auto-Apply</span>
+          <div class="small text-muted">
+            Directly redirects to the <strong class="text-dark">exact job post page</strong> (not search). Uses our <strong class="text-primary">Chrome Extension</strong> or <strong class="text-primary">Bookmarklet</strong> to auto-paste your cover letter &amp; submit while logged in!
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <a href="javascript:(function(){const ta=document.querySelector('textarea');if(ta){ta.value='Dear Hiring Team,\n\nI am applying for this role. With 5 years experience in PHP, Laravel 10, CodeIgniter, MySQL, and REST APIs, I specialize in clean architecture and business software.\n\nPortfolio: https://nishanth0303.github.io/Nishanth-portfolio/php-dev.html\n\nNishanth R | +91 8220607076 | r.nishanth2004@gmail.com';ta.dispatchEvent(new Event('input',{bubbles:true}));ta.dispatchEvent(new Event('change',{bubbles:true}));}const btns=Array.from(document.querySelectorAll('button,input[type=submit]'));const b=btns.find(x=>x.innerText&&x.innerText.trim().toLowerCase()==='apply'||x.innerText&&x.innerText.trim().toLowerCase().includes('apply to'));if(b){b.click();alert('⚡ Auto-applied via JobHuntAI Bookmarklet for Nishanth R!');}else{alert('📋 Cover letter filled into form! Click Apply to complete.');}})();" class="btn btn-sm btn-outline-primary fw-semibold" title="Drag this button to your Chrome Bookmarks Bar">
+            ⭐ Drag: ⚡ 1-Click Auto-Apply Bookmarklet
+          </a>
+          <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#extensionGuideModal">
+            <i class="bi bi-question-circle me-1"></i>How Auto-Apply Works
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Metrics Row -->
     <div class="row g-3 mb-4">
@@ -357,18 +377,21 @@
         <div class="modal-footer border-top justify-content-between">
           <div class="d-flex flex-wrap gap-2">
             <a href="#" target="_blank" class="btn btn-outline-secondary" id="modalJobLink">
-              <i class="bi bi-box-arrow-up-right me-1"></i>Direct Job Listing
+              <i class="bi bi-box-arrow-up-right me-1"></i>Direct Portal Page
             </a>
             <a href="#" target="_blank" class="btn btn-outline-info" id="modalRecruiterLink">
               <i class="bi bi-chat-left-dots me-1"></i>Recruiter Hiring Post
             </a>
+            <button type="button" class="btn btn-outline-warning" id="modalResetBtn" style="display: none;">
+              <i class="bi bi-arrow-counterclockwise me-1"></i>Reset to Pending
+            </button>
           </div>
           <div class="d-flex gap-2">
             <button type="button" class="btn btn-outline-danger" id="notWillingToApplyBtn">
               <i class="bi bi-x-circle me-1"></i>Not Applying (Give Reason)
             </button>
-            <button type="button" class="btn btn-success" id="approveApplyBtn">
-              <i class="bi bi-send-check me-1"></i>Approve &amp; Auto-Apply
+            <button type="button" class="btn btn-success fw-semibold" id="approveApplyBtn">
+              <i class="bi bi-box-arrow-up-right me-1"></i>Open &amp; Apply on <span id="modalApplyBtnPortalName">Portal</span>
             </button>
           </div>
         </div>
@@ -422,6 +445,99 @@
         <div class="modal-footer border-top">
           <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
           <button type="button" class="btn btn-danger" id="confirmSkipReasonBtn">Confirm &amp; Save Reason</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Verify Portal Application Submission -->
+  <div class="modal fade" id="applyConfirmModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold"><i class="bi bi-box-arrow-up-right me-2"></i>Redirected to <span id="confirmPortalName">Portal</span> Post Page</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="d-flex align-items-center gap-3 mb-3 p-3 bg-light rounded border">
+            <div class="fs-1 text-primary"><i class="bi bi-building-check"></i></div>
+            <div>
+              <div class="fw-bold text-dark fs-6" id="confirmJobTitle">Job Title</div>
+              <div class="text-muted small" id="confirmCompany">Company Name</div>
+            </div>
+          </div>
+
+          <div class="alert alert-success d-flex align-items-center gap-2 py-2 mb-3">
+            <i class="bi bi-clipboard-check-fill fs-5 text-success"></i>
+            <div class="small">
+              <strong>Cover Note Copied!</strong> Your tailored cover letter is copied to your clipboard. Press <kbd>Ctrl+V</kbd> to paste it into the application form.
+            </div>
+          </div>
+
+          <div class="alert alert-info py-2 mb-3">
+            <div class="small">
+              <i class="bi bi-lightning-charge-fill text-warning me-1"></i>
+              <strong>Auto-Apply Assistant:</strong> If you have loaded the Chrome Extension, it will automatically fill the form and click the Apply button. If not, paste your note and click Apply on the portal tab.
+            </div>
+          </div>
+
+          <div class="text-center my-3">
+            <a href="#" target="_blank" class="btn btn-sm btn-outline-primary" id="reopenPortalLink">
+              <i class="bi bi-box-arrow-up-right me-1"></i>Re-open Exact Job Post Page
+            </a>
+          </div>
+
+          <hr class="my-3">
+
+          <p class="fw-semibold text-dark small mb-2 text-center">Did you complete submission on the portal?</p>
+          <div class="d-grid gap-2">
+            <button type="button" class="btn btn-success fw-bold py-2" id="confirmSubmittedBtn">
+              <i class="bi bi-check2-circle me-1"></i>Yes, I Submitted (Mark as Applied)
+            </button>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-outline-secondary w-50" data-bs-dismiss="modal">
+                <i class="bi bi-hourglass-split me-1"></i>Still In Progress
+              </button>
+              <button type="button" class="btn btn-outline-danger w-50" id="confirmDidNotApplyBtn">
+                <i class="bi bi-x-circle me-1"></i>Didn't Apply
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: How Auto-Apply Works Guide -->
+  <div class="modal fade" id="extensionGuideModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header border-bottom">
+          <h5 class="modal-title fw-bold"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>How 1-Click Auto-Apply Works</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="alert alert-primary mb-3">
+            <strong>Why Portals Need Authentication:</strong> Portals like Wellfound, Naukri, and LinkedIn require you to be signed in to submit job applications to your personal candidate profile. A standalone website cannot secretly submit forms into your account without a browser extension or bookmarklet.
+          </div>
+
+          <h6 class="fw-bold text-dark mb-2">Option 1: Chrome Extension (Fully Automated)</h6>
+          <ol class="small text-muted mb-3">
+            <li>Open Chrome and go to <code>chrome://extensions</code></li>
+            <li>Enable <strong>Developer Mode</strong> (top right toggle).</li>
+            <li>Click <strong>Load unpacked</strong> and select the <code>extension</code> folder in this project repository.</li>
+            <li>Now whenever you click <strong>"Approve &amp; Apply"</strong>, the job opens and the extension automatically pastes your customized cover letter and triggers the Apply button!</li>
+          </ol>
+
+          <h6 class="fw-bold text-dark mb-2">Option 2: 1-Click Auto-Apply Bookmarklet (Instant, No Installation)</h6>
+          <ol class="small text-muted mb-0">
+            <li>Drag the blue <strong>"⭐ Drag: ⚡ 1-Click Auto-Apply Bookmarklet"</strong> button directly onto your Chrome Bookmarks Bar.</li>
+            <li>When you open any job page (e.g. Wellfound, Naukri, LinkedIn), click that bookmark in your bookmarks bar.</li>
+            <li>It instantly injects your customized cover note into the application box and clicks Apply!</li>
+          </ol>
+        </div>
+        <div class="modal-footer border-top">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Got It!</button>
         </div>
       </div>
     </div>

@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "JobHuntAI - 1-Click Auto Apply Assistant",
+  "version": "1.0.0",
+  "description": "Automated 1-click job application assistant for Nishanth R across Wellfound, Naukri, LinkedIn, Indeed, Cutshort, and Instahyre.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "clipboardRead"
+  ],
+  "host_permissions": [
+    "https://*.wellfound.com/*",
+    "https://*.naukri.com/*",
+    "https://*.linkedin.com/*",
+    "https://*.indeed.com/*",
+    "https://*.instahyre.com/*",
+    "https://*.cutshort.io/*",
+    "https://*.foundit.in/*",
+    "https://*.hirist.tech/*",
+    "https://nishanth0303.github.io/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "JobHuntAI Auto-Apply Assistant"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.wellfound.com/*",
+        "https://*.naukri.com/*",
+        "https://*.linkedin.com/*",
+        "https://*.indeed.com/*",
+        "https://*.instahyre.com/*",
+        "https://*.cutshort.io/*",
+        "https://*.foundit.in/*",
+        "https://*.hirist.tech/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
