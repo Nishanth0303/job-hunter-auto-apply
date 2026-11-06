@@ -1,0 +1,18 @@
+{
+  "name": "job-hunter-auto-apply",
+  "version": "1.0.0",
+  "description": "Automated Job Hunt, CV Matching, Email Notification & 1-Click Auto-Apply Dashboard",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "job-hunter",
+    "auto-apply",
+    "cv-matching",
+    "dashboard",
+    "automation"
+  ],
+  "author": "",
+  "license": "MIT"
+}

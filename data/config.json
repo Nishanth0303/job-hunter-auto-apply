@@ -1,0 +1,78 @@
+{
+  "targetRoles": [
+    "PHP Developer",
+    "Laravel Developer",
+    "CodeIgniter Developer",
+    "PHP Backend Developer",
+    "Backend Developer – PHP",
+    "Software Developer – PHP",
+    "PHP Full Stack Developer",
+    "Web Application Developer",
+    "Laravel Backend Developer",
+    "API Developer – PHP",
+    "Software Engineer – PHP",
+    "Web Application Developer – PHP",
+    "PHP MVC Developer",
+    "PHP Laravel Engineer",
+    "MySQL Developer",
+    "ERP Software Developer",
+    "CRM Software Developer",
+    "E-commerce Developer",
+    "Full Stack Web Developer",
+    "Junior React + PHP Developer"
+  ],
+  "jobTitleTiers": {
+    "excellent": [
+      "PHP Developer",
+      "Laravel Developer",
+      "CodeIgniter Developer",
+      "PHP Backend Developer",
+      "Backend Developer – PHP",
+      "Software Developer – PHP",
+      "PHP MVC Developer",
+      "PHP Laravel Engineer"
+    ],
+    "veryGood": [
+      "PHP Full Stack Developer",
+      "Web Application Developer",
+      "Laravel Backend Developer",
+      "API Developer – PHP",
+      "Software Engineer – PHP",
+      "Web Application Developer – PHP",
+      "ERP Software Developer",
+      "CRM Software Developer",
+      "E-commerce Developer"
+    ],
+    "good": [
+      "MySQL Developer",
+      "Full Stack Web Developer",
+      "Junior React + PHP Developer"
+    ]
+  },
+  "location": "Coimbatore, Chennai, Bangalore, Remote",
+  "recipientEmail": "myemail@example.com",
+  "liveMachineUrl": "http://localhost:3000",
+  "autoApplyThreshold": 85,
+  "experienceYears": 5,
+  "primarySkills": [
+    "PHP (5 Years)",
+    "Laravel 10",
+    "CodeIgniter 3 & 4",
+    "MySQL & Database Optimization",
+    "RESTful API Development",
+    "MVC Architecture",
+    "Payment Gateway Integrations",
+    "ERP Applications",
+    "CRM Systems",
+    "Billing & Invoicing Solutions",
+    "E-commerce Platforms"
+  ],
+  "secondarySkills": [
+    "React (1 Year Hands-on)",
+    "JavaScript (ES6+)",
+    "HTML5 & CSS3",
+    "Bootstrap 5",
+    "Basic Node.js Familiarity (Non-mandatory)"
+  ],
+  "userCV": "Experienced Software Engineer with 5 years of focused expertise specializing in PHP backend and web application development with Laravel (including Laravel 10) and CodeIgniter (3 & 4). Proven track record architecting enterprise systems such as ERP, CRM, Billing platforms, and E-commerce websites. Skilled in complex MySQL query optimization, robust REST API architecture, and third-party payment gateway integrations. Possesses 1 year of practical hands-on experience in React for responsive UI components, alongside basic familiarity with Node.js."
+}
