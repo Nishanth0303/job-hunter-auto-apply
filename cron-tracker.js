@@ -1,3 +1,4 @@
+const agent5 = require('./agent5-verifier');
 /**
  * Automated Job Tracking & Email Notification Service
  * Schedule:
@@ -52,7 +53,8 @@ function getISTDate() {
 function scanPortals(config) {
   const existingJobs = readJSON(JOBS_FILE, []);
   if (existingJobs && existingJobs.length > 0) {
-    return existingJobs;
+    const verified = agent5.processAndFilterJobs(existingJobs);
+    return verified.verifiedJobs;
   }
   return [];
 }

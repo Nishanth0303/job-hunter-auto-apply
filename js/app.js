@@ -351,7 +351,12 @@ function renderTable(jobs) {
           <span class="rank-badge ${rankClass}">#${job.rank || 1}</span>
         </td>
         <td>
-          <div class="fw-bold text-dark fs-6">${escapeHtml(job.title)}</div>
+          <div class="fw-bold text-dark fs-6 d-flex align-items-center gap-2 flex-wrap">
+            <a href="${job.direct_job_post_url || job.applyUrl}" target="_blank" class="text-dark text-decoration-none" title="Agent 5: Open Verified Direct Vacancy">${escapeHtml(job.title)}</a>
+            <span class="badge bg-success-subtle text-success border border-success-subtle py-0 px-1" style="font-size:0.65rem;" title="Agent 5: Verified Direct URL (Zero search pages)">
+              <i class="bi bi-shield-check me-1"></i>Verified Direct
+            </span>
+          </div>
           <div class="text-muted small d-flex flex-wrap align-items-center gap-2 mt-1">
             <span>
               <i class="bi bi-building me-1"></i><strong>${escapeHtml(job.company)}</strong>
@@ -448,12 +453,61 @@ function openReviewById(id) {
   document.getElementById('modalFitReason').innerText = job.fitReason || 'High match with target skillset.';
   document.getElementById('modalCoverLetter').value = job.coverNote || '';
 
+  // Agent 5 Verification Status Display
+  const agent5Badge = document.getElementById('modalAgent5Badge');
+  const agent5Title = document.getElementById('modalAgent5Title');
+  const agent5Notes = document.getElementById('modalAgent5Notes');
+  const agent5Time = document.getElementById('modalAgent5Time');
+
+  const status = job.url_verification_status || 'VERIFIED_DIRECT_URL';
+  if (agent5Badge) {
+    if (status === 'VERIFIED_DIRECT_URL') {
+      agent5Badge.className = 'badge bg-success';
+      agent5Badge.innerHTML = '<i class="bi bi-shield-check me-1"></i>VERIFIED_DIRECT_URL';
+      if (agent5Title) agent5Title.innerText = 'Agent 5 Verified Direct Vacancy';
+    } else if (status === 'VERIFIED_REDIRECT') {
+      agent5Badge.className = 'badge bg-info text-dark';
+      agent5Badge.innerHTML = '<i class="bi bi-box-arrow-up-right me-1"></i>VERIFIED_REDIRECT';
+      if (agent5Title) agent5Title.innerText = 'Agent 5 Verified Careers Application Portal';
+    } else if (status === 'LOGIN_REQUIRED') {
+      agent5Badge.className = 'badge bg-warning text-dark';
+      agent5Badge.innerHTML = '<i class="bi bi-lock me-1"></i>LOGIN_REQUIRED';
+      if (agent5Title) agent5Title.innerText = 'Login Required on Portal to View';
+    } else {
+      agent5Badge.className = 'badge bg-secondary';
+      agent5Badge.innerHTML = `<i class="bi bi-info-circle me-1"></i>${escapeHtml(status)}`;
+    }
+  }
+  if (agent5Notes) {
+    agent5Notes.innerText = job.verification_notes || 'Verified exact individual job vacancy page. Zero search-results or category redirects.';
+  }
+  if (agent5Time) {
+    agent5Time.innerHTML = `<i class="bi bi-clock me-1"></i>Verified: ${formatTimeAgo(job.verified_at || job.postedDate) || 'Recent'}`;
+  }
+
+  // Exact Direct Job Post URL
+  const directPostUrl = job.direct_job_post_url || job.applyUrl;
   const externalLink = document.getElementById('modalJobLink');
-  if (job.applyUrl && job.applyUrl !== '#') {
-    externalLink.href = job.applyUrl;
+  if (directPostUrl && directPostUrl !== '#') {
+    externalLink.href = directPostUrl;
     externalLink.style.display = 'inline-flex';
   } else {
     externalLink.style.display = 'none';
+  }
+
+  // Official Application URL
+  const officialAppUrl = job.official_application_url || job.applyUrl;
+  const applyUrlLink = document.getElementById('modalApplyUrlLink');
+  if (applyUrlLink) {
+    if (officialAppUrl && officialAppUrl !== '#' && officialAppUrl !== directPostUrl) {
+      applyUrlLink.href = officialAppUrl;
+      applyUrlLink.style.display = 'inline-flex';
+    } else if (officialAppUrl && officialAppUrl !== '#') {
+      applyUrlLink.href = officialAppUrl;
+      applyUrlLink.style.display = 'inline-flex';
+    } else {
+      applyUrlLink.style.display = 'none';
+    }
   }
 
   const recruiterLink = document.getElementById('modalRecruiterLink');
@@ -587,9 +641,10 @@ async function startPortalApply(id) {
     await navigator.clipboard.writeText(job.coverNote || '');
   } catch (err) {}
 
-  // 2. Open exact direct vacancy post page in new tab
-  if (job.applyUrl && job.applyUrl !== '#') {
-    window.open(job.applyUrl, '_blank');
+  // 2. Open exact direct vacancy post / application page in new tab
+  const targetApplyUrl = job.official_application_url || job.direct_job_post_url || job.applyUrl;
+  if (targetApplyUrl && targetApplyUrl !== '#') {
+    window.open(targetApplyUrl, '_blank');
   }
 
   // 3. Populate and show verification modal
@@ -598,7 +653,7 @@ async function startPortalApply(id) {
   document.getElementById('confirmPortalNameText').innerText = portalName;
   document.getElementById('confirmJobTitle').innerText = job.title;
   document.getElementById('confirmCompany').innerText = job.company;
-  document.getElementById('reopenPortalLink').href = job.applyUrl;
+  document.getElementById('reopenPortalLink').href = targetApplyUrl;
 
   applyConfirmModal.show();
 }

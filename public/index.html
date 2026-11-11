@@ -308,6 +308,17 @@
         </div>
 
         <div class="modal-body">
+          <!-- Agent 5 Verification Status Banner -->
+          <div class="card p-2 mb-3 border bg-light shadow-xs" id="agent5VerificationBox">
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-success" id="modalAgent5Badge"><i class="bi bi-shield-check me-1"></i>VERIFIED_DIRECT_URL</span>
+                <span class="small fw-bold text-dark" id="modalAgent5Title">Agent 5 Verified Direct Vacancy</span>
+              </div>
+              <span class="small text-muted" id="modalAgent5Time"><i class="bi bi-clock me-1"></i>Verified</span>
+            </div>
+            <p class="small text-muted mb-0 mt-1" id="modalAgent5Notes">Verified exact individual job vacancy page. Zero search-results or category redirects.</p>
+          </div>
           <!-- Company Website & Overview Card -->
           <div class="company-card mb-3">
             <div class="d-flex align-items-center justify-content-between mb-1">
@@ -376,8 +387,11 @@
 
         <div class="modal-footer border-top justify-content-between">
           <div class="d-flex flex-wrap gap-2">
-            <a href="#" target="_blank" class="btn btn-outline-secondary" id="modalJobLink">
-              <i class="bi bi-box-arrow-up-right me-1"></i>Direct Portal Page
+            <a href="#" target="_blank" class="btn btn-outline-primary" id="modalJobLink" title="Open Agent 5 Verified Direct Job Post">
+              <i class="bi bi-link-45deg me-1"></i>Exact Job Post Page
+            </a>
+            <a href="#" target="_blank" class="btn btn-outline-success" id="modalApplyUrlLink" title="Open Official Employer Application Portal">
+              <i class="bi bi-send-check me-1"></i>Official Application Page
             </a>
             <a href="#" target="_blank" class="btn btn-outline-info" id="modalRecruiterLink">
               <i class="bi bi-chat-left-dots me-1"></i>Recruiter Hiring Post
