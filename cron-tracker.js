@@ -50,110 +50,11 @@ function getISTDate() {
 
 // Generate / Fetch Fresh Job Listings
 function scanPortals(config) {
-  const portals = [
-    { name: "Naukri", domain: "naukri.com" },
-    { name: "LinkedIn", domain: "linkedin.com/jobs" },
-    { name: "Instahyre", domain: "instahyre.com" },
-    { name: "Cutshort", domain: "cutshort.io" },
-    { name: "Foundit", domain: "foundit.in" },
-    { name: "Indeed", domain: "in.indeed.com" },
-    { name: "Hirist", domain: "hirist.tech" },
-    { name: "Wellfound", domain: "wellfound.com" }
-  ];
-
-  const locations = [
-    "Coimbatore, Tamil Nadu",
-    "Chennai, Tamil Nadu",
-    "Bangalore, Karnataka",
-    "Remote (Inside India)"
-  ];
-
-  const priorityRoles = [
-    "Senior Laravel Developer",
-    "PHP Backend Developer",
-    "ERP & Billing Software Developer",
-    "CodeIgniter Developer",
-    "PHP Full Stack Developer (Laravel + React)",
-    "PHP MVC Developer",
-    "Web Application Developer – PHP",
-    "API Developer – PHP",
-    "E-commerce Marketplace Developer",
-    "CRM Software Developer"
-  ];
-
-  const companies = [
-    "Kovaion Systems", "TechVibrant Solutions", "Soliton Technologies",
-    "InstaFreight Tech", "Unicorn Retail Platforms", "PayFlex Global",
-    "Cognizant Tech Solutions", "Kalyan InfoTech", "InnoMinds Innovations",
-    "Apex Cloud Systems", "Mobility Dynamics", "Zoho Partner Ecosystem",
-    "Freshworks Partner Firm", "Centrix Solutions", "TradeNest Global",
-    "PixelCraft Studios", "DataBridge Tech", "Zenith Interactive",
-    "AppCraft Technologies", "Vanguard Soft Systems"
-  ];
-
-  const scannedJobs = [];
   const existingJobs = readJSON(JOBS_FILE, []);
-
-  // Generate or re-rank Top 20
-  for (let i = 0; i < 20; i++) {
-    const role = priorityRoles[i % priorityRoles.length];
-    const comp = companies[i % companies.length];
-    const loc = locations[i % locations.length];
-    const portal = portals[i % portals.length];
-    const matchScore = 98 - Math.floor(i * 0.65); // 98% down to 85%
-
-    let matchedResume = "PHP Developer Resume";
-    let portfolioUrl = "https://nishanth0303.github.io/Nishanth-portfolio/php-dev.html";
-
-    if (role.includes("Full Stack") || role.includes("React")) {
-      matchedResume = "Full Stack Developer Resume";
-      portfolioUrl = "https://nishanth0303.github.io/Nishanth-portfolio/full-stack.html";
-    } else if (role.includes("Application") || role.includes("ERP") || role.includes("CRM") || role.includes("E-commerce")) {
-      matchedResume = "Application Developer Resume";
-      portfolioUrl = "https://nishanth0303.github.io/Nishanth-portfolio/application-dev.html";
-    } else if (role.includes("Software")) {
-      matchedResume = "Software Developer Resume";
-      portfolioUrl = "https://nishanth0303.github.io/Nishanth-portfolio/software-dev.html";
-    }
-
-    const tier = matchScore >= 94 ? "Excellent Match" : (matchScore >= 89 ? "Very Good Match" : "Good Match");
-
-    scannedJobs.push({
-      id: `job-in-${String(i + 1).padStart(2, '0')}`,
-      rank: i + 1,
-      title: `${role} (${loc.includes("Remote") ? "Remote India" : loc.split(',')[0]})`,
-      company: comp,
-      location: loc,
-      source: portal.name,
-      postedDate: new Date(Date.now() - i * 3600000).toISOString(),
-      matchScore: matchScore,
-      matchTier: tier,
-      matchedResume: matchedResume,
-      portfolioUrl: portfolioUrl,
-      status: "pending",
-      appliedDate: null,
-      applyUrl: `https://${portal.domain}/search?keywords=${encodeURIComponent(role + " " + loc)}`,
-      portalUrl: `https://${portal.domain}`,
-      salary: `₹${Math.floor(10 + (20 - i) * 0.35)},00,000 - ₹${Math.floor(14 + (20 - i) * 0.35)},00,000 / year`,
-      description: `Opportunity for a 5-year experienced ${role} to lead development on enterprise web applications, ERP, billing logic, and REST APIs using Laravel and CodeIgniter with MySQL.`,
-      fitReason: `Rank #${i + 1} (${tier}): Strong match with your 5 years in PHP, Laravel 10, CodeIgniter 3/4, MySQL optimization, and payment gateways.`,
-      gaps: "Node.js is basic only; core emphasis is on PHP backend architecture.",
-      coverNote: `Dear ${comp} Hiring Team,\n\nI am writing to apply for the ${role} position. With 5 years of specialized backend engineering experience in PHP, Laravel (including Laravel 10), and CodeIgniter (3/4), I have built enterprise ERP, CRM, and billing solutions at Icore Software Technologies and Rk Creators.\n\nMy strengths include database optimization in MySQL, secure RESTful API development, and third-party payment gateway integrations.\n\nPortfolio: ${portfolioUrl}\nLinkedIn: https://linkedin.com/in/rnishanth2004\n\nBest regards,\nNishanth R\nPhone: +91 8220607076\nEmail: r.nishanth2004@gmail.com\nCoimbatore, Tamil Nadu`
-    });
+  if (existingJobs && existingJobs.length > 0) {
+    return existingJobs;
   }
-
-  // Preserve existing applied statuses
-  existingJobs.forEach(oldJob => {
-    if (oldJob.status === 'applied') {
-      const match = scannedJobs.find(sj => sj.id === oldJob.id || sj.title === oldJob.title);
-      if (match) {
-        match.status = 'applied';
-        match.appliedDate = oldJob.appliedDate;
-      }
-    }
-  });
-
-  return scannedJobs;
+  return [];
 }
 
 // Email Dispatch Simulator / Notification Logger
