@@ -104,8 +104,8 @@ async function loadJobs() {
     }
 
     if (!jobsData || jobsData.length === 0) {
-      // Load static data/jobs.json
-      const res = await fetch('data/jobs.json');
+      // Load static data/jobs.json with cache buster to guarantee fresh data
+      const res = await fetch(`data/jobs.json?v=${Date.now()}`);
       jobsData = await res.json();
       
       // Merge with localStorage overrides if running on GitHub Pages
