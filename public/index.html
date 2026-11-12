@@ -178,32 +178,60 @@
     <!-- Main Card with Table & Day-by-Day Report -->
     <div class="card">
       <div class="card-header bg-white border-bottom py-3">
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-          
-          <!-- Filter Tabs -->
-          <div class="btn-group" role="group">
-            <button type="button" class="btn btn-outline-secondary btn-sm active" data-filter="all">All Top 20</button>
-            <button type="button" class="btn btn-outline-secondary btn-sm" data-filter="pending">Pending Review</button>
-            <button type="button" class="btn btn-outline-secondary btn-sm" data-filter="applied">Applied</button>
-            <button type="button" class="btn btn-outline-secondary btn-sm" data-filter="rejected">Skipped (With Reasons)</button>
-            <button type="button" class="btn btn-outline-primary btn-sm" id="viewDailyReportBtn">
-              <i class="bi bi-calendar3 me-1"></i>Day-by-Day Report
-            </button>
-          </div>
-
-          <!-- Search & Actions -->
-          <div class="d-flex align-items-center gap-2 ms-auto">
-            <div class="input-group input-group-sm" style="width: 260px;">
-              <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
-              <input type="text" class="form-control bg-light border-start-0" id="searchInput" placeholder="Search role, portal, city..." />
+        <div class="d-flex flex-column gap-2 w-100">
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <!-- Primary Status Filter Tabs -->
+            <div class="btn-group btn-group-sm" role="group">
+              <button type="button" class="btn btn-outline-secondary active" data-filter="all">All Statuses</button>
+              <button type="button" class="btn btn-outline-secondary" data-filter="pending">Pending Review</button>
+              <button type="button" class="btn btn-outline-secondary" data-filter="applied">Applied</button>
+              <button type="button" class="btn btn-outline-secondary" data-filter="rejected">Skipped (With Reasons)</button>
+              <button type="button" class="btn btn-outline-primary" id="viewDailyReportBtn">
+                <i class="bi bi-calendar3 me-1"></i>Day-by-Day Report
+              </button>
             </div>
 
-            <button class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#addJobModal">
-              <i class="bi bi-plus-lg"></i>
-              <span>Add Job</span>
-            </button>
+            <!-- Search & Actions -->
+            <div class="d-flex align-items-center gap-2 ms-auto">
+              <div class="input-group input-group-sm" style="width: 260px;">
+                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control bg-light border-start-0" id="searchInput" placeholder="Search role, portal, city..." />
+              </div>
+
+              <button class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#addJobModal">
+                <i class="bi bi-plus-lg"></i>
+                <span>Add Job</span>
+              </button>
+            </div>
           </div>
 
+          <!-- Date Freshness & Permanent History Filters -->
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-2 border-top">
+            <div class="d-flex flex-wrap align-items-center gap-1" id="dateFilterButtonGroup">
+              <span class="small fw-bold text-muted me-1"><i class="bi bi-funnel me-1"></i>Freshness &amp; History:</span>
+              <button type="button" class="btn btn-sm btn-outline-primary active" data-date-filter="top20" title="Top 20 Best Matches posted strictly within last 30 days">
+                <i class="bi bi-trophy me-1"></i>Current Top 20 (≤30d)
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-success" data-date-filter="today" title="Jobs discovered or posted Today">
+                <i class="bi bi-calendar-check me-1"></i>Today's Jobs
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-warning text-dark" data-date-filter="yesterday" title="Never lose yesterday's hunted jobs">
+                <i class="bi bi-clock-history me-1"></i>Yesterday's Jobs
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-info" data-date-filter="last7days" title="Jobs discovered or posted within the last 7 days">
+                <i class="bi bi-calendar-week me-1"></i>Last 7 Days
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-date-filter="last30days" title="All jobs within rolling 30-day window">
+                <i class="bi bi-calendar-month me-1"></i>Last 30 Days
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-dark" data-date-filter="history" title="Permanent Job History Record (includes older archives)">
+                <i class="bi bi-archive me-1"></i>All Historical Jobs (<span id="historyJobsCount">0</span>)
+              </button>
+            </div>
+            <div class="small text-muted" id="filterResultSummary">
+              Showing <span class="fw-bold text-dark" id="visibleJobsCount">20</span> jobs
+            </div>
+          </div>
         </div>
       </div>
 
@@ -318,6 +346,11 @@
               <span class="small text-muted" id="modalAgent5Time"><i class="bi bi-clock me-1"></i>Verified</span>
             </div>
             <p class="small text-muted mb-0 mt-1" id="modalAgent5Notes">Verified exact individual job vacancy page. Zero search-results or category redirects.</p>
+            <div class="d-flex flex-wrap gap-3 small text-muted border-top pt-2 mt-2" id="modalDatesRow">
+              <span><i class="bi bi-calendar-event me-1 text-primary"></i><strong>Original Post:</strong> <span id="modalOriginalPostDate" class="text-dark fw-semibold">—</span></span>
+              <span><i class="bi bi-binoculars me-1 text-info"></i><strong>First Discovered:</strong> <span id="modalFirstDiscoveredDate" class="text-dark fw-semibold">—</span></span>
+              <span><i class="bi bi-check-circle me-1 text-success"></i><strong>Last Verified:</strong> <span id="modalLastCheckedDate" class="text-dark fw-semibold">—</span></span>
+            </div>
           </div>
           <!-- Company Website & Overview Card -->
           <div class="company-card mb-3">

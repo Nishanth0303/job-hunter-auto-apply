@@ -1,3 +1,4 @@
+const historyManager = require('./history-manager');
 const agent5 = require('./agent5-verifier');
 const http = require('http');
 const fs = require('fs');

@@ -1,6 +1,8 @@
 // State
-let allJobs = [];
-let currentFilter = 'all';
+let allJobs = []; // Current Top 20 eligible jobs (<= 30 days)
+let historicalJobs = []; // Permanent master history from job_history.json
+let currentFilter = 'all'; // Status filter: 'all', 'pending', 'applied', 'rejected'
+let activeDateFilter = 'top20'; // Freshness/History filter: 'top20', 'today', 'yesterday', 'last7days', 'last30days', 'history'
 let currentJob = null;
 let reviewModal = null;
 let settingsModal = null;
@@ -84,8 +86,19 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.addEventListener('click', (e) => {
       showTableView();
       document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
-      e.target.classList.add('active');
-      currentFilter = e.target.getAttribute('data-filter');
+      e.currentTarget.classList.add('active');
+      currentFilter = e.currentTarget.getAttribute('data-filter');
+      applyFiltersAndRender();
+    });
+  });
+
+  // Freshness & History Date Filter Listeners
+  document.querySelectorAll('[data-date-filter]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      showTableView();
+      document.querySelectorAll('[data-date-filter]').forEach(b => b.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      activeDateFilter = e.currentTarget.getAttribute('data-date-filter');
       applyFiltersAndRender();
     });
   });
@@ -94,33 +107,61 @@ document.addEventListener('DOMContentLoaded', () => {
 async function loadJobs() {
   try {
     let jobsData = [];
+    let historyData = null;
+
     if (!isGitHubPages) {
       try {
-        const res = await fetch('/api/jobs');
-        if (res.ok) jobsData = await res.json();
+        const [resJobs, resHist] = await Promise.all([
+          fetch('/api/jobs').catch(() => null),
+          fetch('/api/jobs/history').catch(() => null)
+        ]);
+        if (resJobs && resJobs.ok) jobsData = await resJobs.json();
+        if (resHist && resHist.ok) historyData = await resHist.json();
       } catch (e) {
-        console.warn('API error, falling back to static file:', e);
+        console.warn('API error, falling back to static files:', e);
       }
     }
 
     if (!jobsData || jobsData.length === 0) {
-      // Load static data/jobs.json with cache buster to guarantee fresh data
       const res = await fetch(`data/jobs.json?v=${Date.now()}`);
       jobsData = await res.json();
-      
-      // Merge with localStorage overrides if running on GitHub Pages
-      const savedStatus = JSON.parse(localStorage.getItem('job_status_overrides') || '{}');
-      jobsData.forEach(j => {
-        if (savedStatus[j.id]) {
-          j.status = savedStatus[j.id].status;
-          j.appliedDate = savedStatus[j.id].appliedDate;
-          j.skipReason = savedStatus[j.id].skipReason || j.skipReason;
-        }
-      });
     }
 
-    // Sort descending by matchScore (Rank 1 to 20)
-    jobsData.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
+    if (!historyData) {
+      try {
+        const resHist = await fetch(`data/job_history.json?v=${Date.now()}`);
+        if (resHist.ok) historyData = await resHist.json();
+      } catch (e) {}
+    }
+
+    // Merge with localStorage overrides to guarantee applied/skipped statuses are preserved
+    const savedStatus = JSON.parse(localStorage.getItem('job_status_overrides') || '{}');
+    const applySavedStatus = (j) => {
+      const key = j.job_id || j.id;
+      if (savedStatus[key]) {
+        j.status = savedStatus[key].status;
+        j.appliedDate = savedStatus[key].appliedDate;
+        j.skipReason = savedStatus[key].skipReason || j.skipReason;
+      }
+      return j;
+    };
+
+    jobsData.forEach(applySavedStatus);
+
+    if (historyData && Array.isArray(historyData.jobs)) {
+      historicalJobs = historyData.jobs.map(applySavedStatus);
+    } else {
+      historicalJobs = [...jobsData];
+    }
+
+    // Update history count badge in header
+    const historyCountEl = document.getElementById('historyJobsCount');
+    if (historyCountEl) {
+      historyCountEl.innerText = historicalJobs.length;
+    }
+
+    // Sort descending by matchScore (Rank 1 to N)
+    jobsData.sort((a, b) => (b.matchScore || b.match_score || 0) - (a.matchScore || a.match_score || 0));
     jobsData.forEach((j, idx) => {
       j.rank = idx + 1;
     });
@@ -272,20 +313,64 @@ function renderDailyReportData() {
 
 function applyFiltersAndRender() {
   const search = document.getElementById('searchInput').value.toLowerCase().trim();
-  let filtered = allJobs;
+  
+  // 1. Select base pool according to activeDateFilter
+  let basePool = allJobs;
+  const todayStr = '2026-11-12';
+  const yesterdayStr = '2026-11-11';
 
+  if (activeDateFilter === 'top20') {
+    // Current Top 20 eligible jobs (strictly <= 30 days old)
+    basePool = allJobs;
+  } else if (activeDateFilter === 'today') {
+    // Today's jobs
+    basePool = historicalJobs.filter(j => 
+      j.first_discovered_date === todayStr || 
+      j.posting_age_days === 0 || 
+      (j.postedDate && j.postedDate.startsWith(todayStr)) ||
+      (j.posting_date && j.posting_date.startsWith(todayStr))
+    );
+  } else if (activeDateFilter === 'yesterday') {
+    // Yesterday's jobs (Preserved permanently!)
+    basePool = historicalJobs.filter(j => 
+      j.first_discovered_date === yesterdayStr || 
+      j.posting_age_days === 1 || 
+      (j.postedDate && j.postedDate.startsWith(yesterdayStr)) ||
+      (j.posting_date && j.posting_date.startsWith(yesterdayStr))
+    );
+  } else if (activeDateFilter === 'last7days') {
+    // Last 7 days
+    basePool = historicalJobs.filter(j => j.posting_age_days !== null && j.posting_age_days <= 7);
+  } else if (activeDateFilter === 'last30days') {
+    // Last 30 days
+    basePool = historicalJobs.filter(j => j.is_within_30_days === true);
+  } else if (activeDateFilter === 'history') {
+    // All Historical Jobs (Permanent repository)
+    basePool = historicalJobs;
+  }
+
+  // 2. Status filter
+  let filtered = basePool;
   if (currentFilter !== 'all') {
     filtered = filtered.filter(j => j.status === currentFilter);
   }
 
+  // 3. Keyword Search filter
   if (search) {
-    filtered = filtered.filter(j => 
-      (j.title && j.title.toLowerCase().includes(search)) ||
-      (j.company && j.company.toLowerCase().includes(search)) ||
-      (j.location && j.location.toLowerCase().includes(search)) ||
-      (j.source && j.source.toLowerCase().includes(search)) ||
-      (j.skipReason && j.skipReason.toLowerCase().includes(search))
-    );
+    filtered = filtered.filter(j => {
+      const title = (j.title || j.job_title || '').toLowerCase();
+      const comp = (j.company || j.company_name || '').toLowerCase();
+      const loc = (j.location || '').toLowerCase();
+      const src = (j.source || j.portal || '').toLowerCase();
+      const skip = (j.skipReason || '').toLowerCase();
+      return title.includes(search) || comp.includes(search) || loc.includes(search) || src.includes(search) || skip.includes(search);
+    });
+  }
+
+  // Update visible count in UI
+  const visibleCountEl = document.getElementById('visibleJobsCount');
+  if (visibleCountEl) {
+    visibleCountEl.innerText = filtered.length;
   }
 
   renderTable(filtered);
@@ -352,10 +437,11 @@ function renderTable(jobs) {
         </td>
         <td>
           <div class="fw-bold text-dark fs-6 d-flex align-items-center gap-2 flex-wrap">
-            <a href="${job.direct_job_post_url || job.applyUrl}" target="_blank" class="text-dark text-decoration-none" title="Agent 5: Open Verified Direct Vacancy">${escapeHtml(job.title)}</a>
+            <a href="${job.direct_job_post_url || job.job_detail_url || job.applyUrl}" target="_blank" class="text-dark text-decoration-none hover-primary" title="Agent 5: Open Verified Direct Vacancy">${escapeHtml(job.title || job.job_title)}</a>
             <span class="badge bg-success-subtle text-success border border-success-subtle py-0 px-1" style="font-size:0.65rem;" title="Agent 5: Verified Direct URL (Zero search pages)">
               <i class="bi bi-shield-check me-1"></i>Verified Direct
             </span>
+            ${job.is_within_30_days === false ? `<span class="badge bg-danger-subtle text-danger border border-danger-subtle py-0 px-1" style="font-size:0.65rem;" title="Posting exceeds 30-day freshness rule (>30d old)"><i class="bi bi-exclamation-octagon me-1"></i>>30d Old (${escapeHtml(job.freshness_label || 'Archived')})</span>` : ''}
           </div>
           <div class="text-muted small d-flex flex-wrap align-items-center gap-2 mt-1">
             <span>
@@ -379,7 +465,15 @@ function renderTable(jobs) {
         </td>
         <td>
           <div>${sourceBadge}</div>
-          <small class="text-muted d-block mt-1">${formatTimeAgo(job.postedDate)}</small>
+          <div class="small fw-semibold text-dark mt-1" style="font-size:0.8rem;">
+            <i class="bi bi-calendar-event me-1 text-primary"></i>Posted: ${escapeHtml(job.freshness_label || formatTimeAgo(job.postedDate || job.posting_date))}
+          </div>
+          <div class="text-muted" style="font-size:0.72rem;">
+            <i class="bi bi-binoculars me-1 text-info"></i>Found: ${escapeHtml(job.first_discovered_date || '2026-11-11')}
+          </div>
+          <div class="text-muted" style="font-size:0.72rem;">
+            <i class="bi bi-patch-check text-success me-1"></i>Checked: ${escapeHtml(job.last_checked_date || '2026-11-12')}
+          </div>
         </td>
         <td>${statusBadge}</td>
         <td>${appliedInfo}</td>
@@ -482,7 +576,19 @@ function openReviewById(id) {
     agent5Notes.innerText = job.verification_notes || 'Verified exact individual job vacancy page. Zero search-results or category redirects.';
   }
   if (agent5Time) {
-    agent5Time.innerHTML = `<i class="bi bi-clock me-1"></i>Verified: ${formatTimeAgo(job.verified_at || job.postedDate) || 'Recent'}`;
+    agent5Time.innerHTML = `<i class="bi bi-clock me-1"></i>Verified: ${formatTimeAgo(job.verified_at || job.last_checked_date || job.postedDate) || 'Recent'}`;
+  }
+  const modalOrigDate = document.getElementById('modalOriginalPostDate');
+  if (modalOrigDate) {
+    modalOrigDate.innerText = `${job.freshness_label || formatTimeAgo(job.postedDate || job.posting_date)} (${job.posting_date ? new Date(job.posting_date).toLocaleDateString() : 'Active'})`;
+  }
+  const modalFirstDisc = document.getElementById('modalFirstDiscoveredDate');
+  if (modalFirstDisc) {
+    modalFirstDisc.innerText = job.first_discovered_date || '2026-11-11';
+  }
+  const modalLastChk = document.getElementById('modalLastCheckedDate');
+  if (modalLastChk) {
+    modalLastChk.innerText = job.last_checked_date || '2026-11-12';
   }
 
   // Exact Direct Job Post URL

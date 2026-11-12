@@ -1,3 +1,4 @@
+const historyManager = require('./history-manager');
 const agent5 = require('./agent5-verifier');
 /**
  * Automated Job Tracking & Email Notification Service
@@ -51,12 +52,11 @@ function getISTDate() {
 
 // Generate / Fetch Fresh Job Listings
 function scanPortals(config) {
-  const existingJobs = readJSON(JOBS_FILE, []);
-  if (existingJobs && existingJobs.length > 0) {
-    const verified = agent5.processAndFilterJobs(existingJobs);
-    return verified.verifiedJobs;
-  }
-  return [];
+  const ist = getISTDate();
+  const history = historyManager.loadJobHistory();
+  // Record daily scan, enforce 30-day freshness, preserve yesterday's records
+  const result = historyManager.recordDailyScan(history.jobs, ist.dateStr);
+  return result.top20Jobs;
 }
 
 // Email Dispatch Simulator / Notification Logger
