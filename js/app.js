@@ -412,7 +412,11 @@ function renderTable(jobs) {
     if (isApplied) {
       statusBadge = `<span class="badge badge-status-applied"><i class="bi bi-check-circle-fill me-1"></i>Applied</span>`;
     } else if (isSkipped) {
-      statusBadge = `<span class="badge badge-status-rejected text-truncate d-inline-block" style="max-width: 170px;" title="${escapeHtml(job.skipReason || 'Not applying')}"><i class="bi bi-x-circle me-1"></i>Skipped: ${escapeHtml(job.skipReason || 'Dismissed')}</span>`;
+      if (job.skipReason && job.skipReason.toLowerCase().includes('already applied')) {
+        statusBadge = `<span class="badge bg-info-subtle text-info-emphasis border border-info-subtle text-truncate d-inline-block" style="max-width: 170px;" title="${escapeHtml(job.skipReason)}"><i class="bi bi-check2-all me-1"></i>${escapeHtml(job.skipReason)}</span>`;
+      } else {
+        statusBadge = `<span class="badge badge-status-rejected text-truncate d-inline-block" style="max-width: 170px;" title="${escapeHtml(job.skipReason || 'Not applying')}"><i class="bi bi-x-circle me-1"></i>Skipped: ${escapeHtml(job.skipReason || 'Dismissed')}</span>`;
+      }
     }
 
     const sourceBadge = getPortalBadge(job.source);
