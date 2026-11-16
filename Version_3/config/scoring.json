@@ -1,0 +1,38 @@
+{
+  "version": "3.0.0",
+  "eligibility_gate": {
+    "max_posting_age_days": 30,
+    "require_verified_url": true,
+    "exclude_unknown_dates": true,
+    "allowed_verification_statuses": [
+      "VERIFIED_DIRECT_URL",
+      "VERIFIED_REDIRECT"
+    ]
+  },
+  "relevance_weights": {
+    "core_skills": 0.45,
+    "experience": 0.25,
+    "domain_alignment": 0.20,
+    "location_preference": 0.10
+  },
+  "tier_thresholds": {
+    "excellent": { "min": 94, "label": "Excellent Match" },
+    "very_good": { "min": 89, "label": "Very Good Match" },
+    "good": { "min": 83, "label": "Good Match" },
+    "fair": { "min": 0, "label": "Potential Match" }
+  },
+  "location_scores": {
+    "coimbatore": 100,
+    "chennai": 95,
+    "bangalore": 95,
+    "remote": 100,
+    "india": 90,
+    "other": 50
+  },
+  "experience_brackets": {
+    "ideal_min_years": 4.0,
+    "ideal_max_years": 6.0,
+    "candidate_years": 5.0
+  }
+}
+

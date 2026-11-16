@@ -1,0 +1,112 @@
+{
+  "candidate": {
+    "name": "Nishanth R",
+    "title": "Senior PHP / Full-Stack Developer",
+    "location": "Coimbatore, Tamil Nadu",
+    "education": "B.E. Computer Science and Engineering (2017 - 2021)",
+    "experience_years": 5.0,
+    "work_preference": {
+      "target_locations": ["Coimbatore", "Chennai", "Bangalore", "Remote (Inside India)"],
+      "employment_types": ["Full-Time", "Contract"],
+      "work_modes": ["On-site", "Hybrid", "Remote"]
+    },
+    "contact_masked": {
+      "email": "r.***@gmail.com",
+      "phone": "+91 ********76",
+      "portfolio_url": "https://nishanth0303.github.io/Nishanth-portfolio/",
+      "linkedin_url": "https://linkedin.com/in/rnishanth2004"
+    },
+    "verified_employers": [
+      {
+        "company": "Icore Software Technologies",
+        "role": "Software Developer (PHP / Full-Stack)",
+        "period": "Jun 2025 – Present",
+        "location": "Coimbatore, India",
+        "description": "Engineering web applications and e-commerce backends across Laravel 10 and CodeIgniter. Building modular architectures and optimizing database request cycles.",
+        "source_citation": "php-dev.html:160-168, full-stack.html:160-168"
+      },
+      {
+        "company": "Rk Creators",
+        "role": "PHP / Full-Stack Developer",
+        "period": "Sep 2022 – Jun 2025",
+        "location": "Coimbatore, India",
+        "description": "Built end-to-end custom CRM systems, billing portals, multi-slab tax computation engines, MySQL database schemas, and payment gateway connections.",
+        "source_citation": "php-dev.html:170-178, full-stack.html:170-178"
+      }
+    ],
+    "verified_skills": {
+      "core_backend": [
+        "PHP 8 (OOP)",
+        "Laravel 10",
+        "CodeIgniter 3/4",
+        "MySQL",
+        "REST APIs",
+        "MVC Architecture"
+      ],
+      "database_and_performance": [
+        "MySQL Database Design",
+        "Query Optimization",
+        "Composite Indexing",
+        "Database Normalization"
+      ],
+      "integrations_and_cloud": [
+        "Payment Gateway Integration",
+        "AWS S3 Cloud Storage",
+        "cURL Integrations",
+        "DomPDF"
+      ],
+      "enterprise_domains": [
+        "ERP Systems (Wholesale & Retail Jewelry)",
+        "CRM Platforms & Lead Management",
+        "Multi-Company Automated Billing Portals",
+        "E-Commerce Product Catalogs & Cart Engines",
+        "Payroll & Multi-Slab Tax Computation"
+      ],
+      "frontend_and_tools": [
+        "React.js (1 Year hands-on component & state)",
+        "JavaScript (ES6+)",
+        "jQuery",
+        "AJAX",
+        "Bootstrap",
+        "Git",
+        "Node.js & Express"
+      ],
+      "security_and_system": [
+        "CSP Nonce Security Suites",
+        "RBAC Authentication",
+        "TSC Thermal Printer Drivers"
+      ]
+    },
+    "resume_variants": {
+      "php_dev": {
+        "id": "php_dev",
+        "label": "PHP Developer Resume",
+        "target_keywords": ["PHP", "Laravel", "CodeIgniter", "MySQL", "REST APIs", "MVC"],
+        "portfolio_slug": "php-dev.html",
+        "evidence_file": "php-dev.html"
+      },
+      "software_dev": {
+        "id": "software_dev",
+        "label": "Software Developer Resume",
+        "target_keywords": ["Software Developer", "ERP", "Enterprise", "Backend Engineering", "Database Optimization"],
+        "portfolio_slug": "software-dev.html",
+        "evidence_file": "software-dev.html"
+      },
+      "application_dev": {
+        "id": "application_dev",
+        "label": "Application Developer Resume",
+        "target_keywords": ["Application Developer", "CRM", "Billing Logic", "E-commerce", "S3 Storage"],
+        "portfolio_slug": "application-dev.html",
+        "evidence_file": "general-dev.html"
+      },
+      "fullstack_dev": {
+        "id": "fullstack_dev",
+        "label": "Full Stack Developer Resume",
+        "target_keywords": ["Full Stack", "React", "React.js", "Node.js", "Frontend", "JavaScript"],
+        "portfolio_slug": "full-stack.html",
+        "evidence_file": "full-stack.html"
+      }
+    }
+  }
+}
+

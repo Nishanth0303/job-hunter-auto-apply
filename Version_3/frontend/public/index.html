@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JobHuntAI V3.0 — Nishanth R (5 Yrs PHP/Laravel) Dashboard</title>
+  
+  <!-- Bootstrap 5 & Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  
+  <!-- Custom Styling -->
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .skill-pill { cursor: pointer; transition: all 0.15s ease; user-select: none; }
+    .skill-pill:hover { transform: scale(1.05); }
+    .skill-highlight-match { background-color: #d1e7dd !important; color: #0f5132 !important; font-weight: bold; padding: 2px 4px; border-radius: 4px; }
+    .skill-highlight-gap { background-color: #fff3cd !important; color: #664d03 !important; font-weight: bold; padding: 2px 4px; border-radius: 4px; }
+    .company-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; }
+    .time-filter-btn.active { background-color: #0d6efd !important; color: #fff !important; }
+    .nav-tabs .nav-link { font-weight: 600; color: #475569; }
+    .nav-tabs .nav-link.active { color: #0d6efd; border-bottom: 3px solid #0d6efd; }
+  </style>
+</head>
+<body class="bg-light">
+
+  <!-- Top Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top py-2">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand navbar-brand-custom" href="./">
+        <div class="brand-icon">
+          <i class="bi bi-briefcase-fill"></i>
+        </div>
+        <span>JobHunt<span class="text-primary">AI</span> <span class="badge bg-primary-subtle text-primary border border-primary-subtle fs-6 ms-1">v3.0</span> <small class="text-secondary fs-6 fw-normal ms-1">| Nishanth R (5 Yrs PHP/Laravel)</small></span>
+      </a>
+
+      <div class="d-flex align-items-center gap-2 ms-auto">
+        <span class="badge bg-success-subtle text-success border border-success-subtle d-none d-lg-flex align-items-center gap-1 px-3 py-2" id="backendStatusPill">
+          <i class="bi bi-shield-check"></i>
+          <span>Backend: Operational</span>
+        </span>
+
+        <span class="badge bg-light text-dark border d-none d-md-flex align-items-center gap-1 px-3 py-2">
+          <i class="bi bi-calendar-check text-primary"></i>
+          <span>30-Day Gate: ACTIVE</span>
+        </span>
+
+        <button class="btn btn-outline-secondary d-flex align-items-center gap-1" id="settingsBtn">
+          <i class="bi bi-sliders"></i>
+          <span>Settings &amp; CV</span>
+        </button>
+
+        <button class="btn btn-primary d-flex align-items-center gap-2" id="scanJobsBtn">
+          <i class="bi bi-search"></i>
+          <span>Scan Top 20 Jobs</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Top 8 Indian Job Portals Bar -->
+  <div class="bg-white border-bottom py-2 shadow-sm">
+    <div class="container-fluid px-4">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <div class="small fw-bold text-uppercase text-secondary d-flex align-items-center gap-1">
+          <i class="bi bi-geo-alt-fill text-danger"></i>
+          <span>Top 8 India Portals (Coimbatore / Chennai / Bangalore / Remote):</span>
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+          <a href="https://www.naukri.com/php-developer-jobs" target="_blank" class="badge badge-portal badge-naukri portal-pill">
+            <i class="bi bi-briefcase-fill"></i> Naukri (Must Use)
+          </a>
+          <a href="https://www.linkedin.com/jobs/search/?keywords=PHP+Developer&location=India" target="_blank" class="badge badge-portal badge-linkedin portal-pill">
+            <i class="bi bi-linkedin"></i> LinkedIn
+          </a>
+          <a href="https://www.instahyre.com/" target="_blank" class="badge badge-portal badge-instahyre portal-pill">
+            <i class="bi bi-lightning-charge-fill"></i> Instahyre
+          </a>
+          <a href="https://cutshort.io/jobs/php-laravel-symfony-jobs-in-chennai" target="_blank" class="badge badge-portal badge-cutshort portal-pill">
+            <i class="bi bi-code-slash"></i> Cutshort
+          </a>
+          <a href="https://www.foundit.in/search/php-jobs" target="_blank" class="badge badge-portal badge-foundit portal-pill">
+            <i class="bi bi-search"></i> Foundit
+          </a>
+          <a href="https://in.indeed.com/q-php-%26-laravel-developer-l-tamil-nadu-jobs.html" target="_blank" class="badge badge-portal badge-indeed portal-pill">
+            <i class="bi bi-check2-circle"></i> Indeed
+          </a>
+          <a href="https://www.hirist.tech/j/php-developer-laravel-codeigniter-1637097?jobPos=3" target="_blank" class="badge badge-portal badge-hirist portal-pill">
+            <i class="bi bi-stars"></i> Hirist
+          </a>
+          <a href="https://wellfound.com/jobs/4092860-laravel-developer" target="_blank" class="badge badge-portal badge-wellfound portal-pill">
+            <i class="bi bi-peace"></i> Wellfound
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="container-fluid px-4 py-3">
+
+    <!-- Metrics Cards Row -->
+    <div class="row g-3 mb-3">
+      <div class="col-6 col-md-3">
+        <div class="card border shadow-sm h-100">
+          <div class="card-body d-flex align-items-center justify-content-between p-3">
+            <div>
+              <div class="text-uppercase text-secondary fw-semibold small">Active Top Ranked</div>
+              <div class="fs-3 fw-bold text-dark" id="statTopRanked">19</div>
+              <div class="small text-muted"><i class="bi bi-shield-check text-success"></i> <=30d &amp; Direct URL</div>
+            </div>
+            <div class="metric-icon bg-primary-subtle text-primary p-3 rounded-circle fs-4">
+              <i class="bi bi-trophy-fill"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="card border shadow-sm h-100">
+          <div class="card-body d-flex align-items-center justify-content-between p-3">
+            <div>
+              <div class="text-uppercase text-secondary fw-semibold small">Pending Review</div>
+              <div class="fs-3 fw-bold text-warning" id="statPending">17</div>
+              <div class="small text-muted"><i class="bi bi-hourglass-split"></i> Awaiting candidate action</div>
+            </div>
+            <div class="metric-icon bg-warning-subtle text-warning p-3 rounded-circle fs-4">
+              <i class="bi bi-envelope-open-fill"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="card border shadow-sm h-100">
+          <div class="card-body d-flex align-items-center justify-content-between p-3">
+            <div>
+              <div class="text-uppercase text-secondary fw-semibold small">Applied</div>
+              <div class="fs-3 fw-bold text-success" id="statApplied">1</div>
+              <div class="small text-muted"><i class="bi bi-send-check"></i> Explicitly confirmed</div>
+            </div>
+            <div class="metric-icon bg-success-subtle text-success p-3 rounded-circle fs-4">
+              <i class="bi bi-check-circle-fill"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="card border shadow-sm h-100">
+          <div class="card-body d-flex align-items-center justify-content-between p-3">
+            <div>
+              <div class="text-uppercase text-secondary fw-semibold small">Skipped / History</div>
+              <div class="fs-3 fw-bold text-secondary" id="statSkipped">4</div>
+              <div class="small text-muted"><i class="bi bi-archive-fill"></i> Logged with reasons</div>
+            </div>
+            <div class="metric-icon bg-secondary-subtle text-secondary p-3 rounded-circle fs-4">
+              <i class="bi bi-slash-circle-fill"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs & Time Filters -->
+    <div class="card border shadow-sm mb-3">
+      <div class="card-body p-3">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 border-bottom pb-3 mb-3">
+          <!-- Primary Status Tabs -->
+          <ul class="nav nav-pills gap-2" id="statusTabs">
+            <li class="nav-item">
+              <button class="nav-link active" data-tab="all">
+                <i class="bi bi-grid-fill me-1"></i> All Top Ranked (<span id="tabCountAll">19</span>)
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-tab="pending">
+                <i class="bi bi-hourglass-split me-1"></i> Pending Review (<span id="tabCountPending">17</span>)
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-tab="applied">
+                <i class="bi bi-check2-all me-1"></i> Applied (<span id="tabCountApplied">1</span>)
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-tab="skipped">
+                <i class="bi bi-x-circle me-1"></i> Skipped (With Reasons) (<span id="tabCountSkipped">4</span>)
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-tab="history">
+                <i class="bi bi-calendar3 me-1"></i> Day-by-Day Report
+              </button>
+            </li>
+          </ul>
+
+          <!-- Time Window Filter Buttons -->
+          <div class="btn-group btn-group-sm" role="group" id="timeFilters">
+            <button type="button" class="btn btn-outline-secondary time-filter-btn active" data-time="all">All Top 20</button>
+            <button type="button" class="btn btn-outline-secondary time-filter-btn" data-time="today">Today's Jobs</button>
+            <button type="button" class="btn btn-outline-secondary time-filter-btn" data-time="yesterday">Yesterday's Jobs</button>
+            <button type="button" class="btn btn-outline-secondary time-filter-btn" data-time="7d">Last 7 Days</button>
+            <button type="button" class="btn btn-outline-secondary time-filter-btn" data-time="30d">Last 30 Days</button>
+            <button type="button" class="btn btn-outline-secondary time-filter-btn" data-time="historical">All Historical</button>
+          </div>
+        </div>
+
+        <!-- Filter Search & Portal Bar -->
+        <div class="row g-2 align-items-center">
+          <div class="col-12 col-md-4">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-white"><i class="bi bi-search text-secondary"></i></span>
+              <input type="text" class="form-control" id="searchInput" placeholder="Search role, portal, city, skill..." />
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <select class="form-select form-select-sm" id="portalFilter">
+              <option value="all">All Portals (8 India Sources)</option>
+              <option value="LinkedIn">LinkedIn</option>
+              <option value="Naukri">Naukri</option>
+              <option value="Wellfound">Wellfound</option>
+              <option value="Hirist">Hirist</option>
+              <option value="Cutshort">Cutshort</option>
+              <option value="Instahyre">Instahyre</option>
+              <option value="Foundit">Foundit</option>
+              <option value="Indeed">Indeed</option>
+            </select>
+          </div>
+          <div class="col-6 col-md-3">
+            <select class="form-select form-select-sm" id="locationFilter">
+              <option value="all">All Locations</option>
+              <option value="Coimbatore">Coimbatore</option>
+              <option value="Chennai">Chennai</option>
+              <option value="Bangalore">Bangalore</option>
+              <option value="Remote">Remote (India)</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-2 text-md-end">
+            <button class="btn btn-outline-primary btn-sm w-100" id="resetFiltersBtn">
+              <i class="bi bi-arrow-counterclockwise"></i> Reset Filters
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Jobs Table View -->
+    <div class="card border shadow-sm" id="jobsTableCard">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="jobsTable">
+          <thead class="table-light small text-uppercase text-secondary">
+            <tr>
+              <th style="width: 50px;" class="text-center">Rank</th>
+              <th>Job Title, Company &amp; Location</th>
+              <th style="width: 140px;">Relevance Fit</th>
+              <th style="width: 130px;">Portal &amp; Date</th>
+              <th style="width: 180px;">Status &amp; Reason</th>
+              <th style="width: 110px;">Applied On</th>
+              <th style="width: 160px;" class="text-end pe-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="jobsTableBody">
+            <!-- Rendered dynamically by app.js -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="text-center py-5 d-none">
+        <i class="bi bi-inbox text-secondary fs-1 mb-2"></i>
+        <h5 class="fw-bold text-dark">No Jobs Match Current Filters</h5>
+        <p class="text-secondary small mb-3">Try adjusting your status tab, time window, or portal filters.</p>
+        <button class="btn btn-sm btn-outline-primary" onclick="resetFilters()">Reset All Filters</button>
+      </div>
+    </div>
+
+    <!-- Historical Day-by-Day View Container -->
+    <div class="card border shadow-sm p-4 d-none" id="historyViewContainer">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h5 class="fw-bold text-dark mb-0"><i class="bi bi-calendar3 me-2 text-primary"></i>Daily Job Hunting Snapshots</h5>
+        <span class="badge bg-light text-secondary border px-3 py-2">Permanent Historical Ledger</span>
+      </div>
+      <p class="text-secondary small">Every daily scan snapshot is permanently preserved in JSON format. Yesterday's discovered jobs remain fully accessible.</p>
+      <div id="historySnapshotsList" class="list-group">
+        <!-- Rendered by app.js -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL 1: Job Review & Match Inspector -->
+  <div class="modal fade" id="jobDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header border-bottom py-3">
+          <div class="w-100 d-flex align-items-center justify-content-between">
+            <div>
+              <h5 class="modal-title fw-bold text-dark mb-1" id="modalJobTitle">PHP Developer</h5>
+              <div class="small text-secondary" id="modalCompanyLocation">Company · Location</div>
+            </div>
+            <div class="text-end">
+              <span class="badge bg-primary fs-6 px-3 py-2" id="modalMatchScore">98% Match</span>
+            </div>
+          </div>
+          <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body p-4">
+          <!-- Agent 5 Verification Status Banner -->
+          <div class="alert alert-success d-flex align-items-center gap-2 py-2 px-3 mb-3" id="modalVerificationBanner">
+            <i class="bi bi-patch-check-fill fs-5"></i>
+            <div>
+              <strong id="modalVerificationBadge">VERIFIED_DIRECT_URL</strong>
+              <div class="small" id="modalVerificationNote">Exact individual vacancy page verified by Agent 5.</div>
+            </div>
+          </div>
+
+          <!-- Company Details Card -->
+          <div class="company-card mb-3">
+            <div class="d-flex align-items-center justify-content-between mb-1">
+              <div class="fw-bold text-dark" id="modalCompanyHeader">Company Overview</div>
+              <a href="#" target="_blank" class="small text-primary text-decoration-none" id="modalCompanyWebsite">
+                <i class="bi bi-box-arrow-up-right me-1"></i>Official Website
+              </a>
+            </div>
+            <div class="small text-secondary" id="modalCompanyDetails">Active technology employer.</div>
+          </div>
+
+          <!-- Suggested Resume Variant -->
+          <div class="d-flex align-items-center justify-content-between bg-light p-2 rounded border mb-3">
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                <i class="bi bi-file-earmark-person me-1"></i>Suggested Resume
+              </span>
+              <span class="fw-bold small text-dark" id="modalMatchedResume">PHP Developer Resume</span>
+            </div>
+            <a href="#" target="_blank" class="btn btn-outline-primary btn-sm py-0 px-2" id="modalPortfolioLink">
+              <i class="bi bi-link-45deg me-1"></i>View Portfolio Page
+            </a>
+          </div>
+
+          <!-- Skills Match Inspector -->
+          <div class="card border mb-3">
+            <div class="card-header bg-white py-2 d-flex align-items-center justify-content-between">
+              <span class="fw-bold small text-dark"><i class="bi bi-stars text-warning me-1"></i>Skills Match Inspector</span>
+              <span class="text-muted small">Citations from Candidate Profile</span>
+            </div>
+            <div class="card-body p-3">
+              <div class="mb-2">
+                <span class="badge bg-success me-1">Matched:</span>
+                <span id="modalMatchedSkillsBadges"></span>
+              </div>
+              <div>
+                <span class="badge bg-warning text-dark me-1">Gaps / Focus:</span>
+                <span id="modalUnmatchedSkillsBadges"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Explainable Fit Reason -->
+          <div class="card border mb-3 bg-success-subtle border-success-subtle">
+            <div class="card-body p-3">
+              <h6 class="fw-bold text-success mb-1"><i class="bi bi-lightbulb-fill me-1"></i>Why You Fit This Role (Relevance Analysis)</h6>
+              <p class="small text-dark mb-0" id="modalFitReason">Explainable fit reason loaded here.</p>
+            </div>
+          </div>
+
+          <!-- Job Description -->
+          <div class="mb-3">
+            <h6 class="fw-bold text-dark mb-2">Job Description</h6>
+            <div class="p-3 bg-white border rounded small text-secondary" id="modalJobDescription" style="max-height: 180px; overflow-y: auto;">
+              Description content.
+            </div>
+          </div>
+
+          <!-- Tailored Cover Letter -->
+          <div>
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h6 class="fw-bold text-dark mb-0">Role-Tailored Cover Letter (Nishanth R)</h6>
+              <button class="btn btn-outline-secondary btn-sm py-0 px-2" id="copyCoverLetterBtn">
+                <i class="bi bi-clipboard me-1"></i>Copy Letter
+              </button>
+            </div>
+            <textarea class="form-control font-monospace small bg-light" id="modalCoverLetter" rows="6" readonly></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer border-top py-2 d-flex justify-content-between">
+          <div class="d-flex gap-2">
+            <a href="#" target="_blank" class="btn btn-outline-secondary btn-sm" id="modalDirectPageBtn">
+              <i class="bi bi-link-45deg me-1"></i>Exact Job Post Page
+            </a>
+            <a href="#" target="_blank" class="btn btn-outline-info btn-sm" id="modalOfficialAppBtn">
+              <i class="bi bi-box-arrow-up-right me-1"></i>Official Application Page
+            </a>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-danger btn-sm" id="modalNotApplyingBtn">
+              <i class="bi bi-x-circle me-1"></i>Not Applying (Give Reason)
+            </button>
+            <button type="button" class="btn btn-success btn-sm" id="modalOpenApplyBtn">
+              <i class="bi bi-send-fill me-1"></i>Open &amp; Apply on Portal
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Skip Reason Modal -->
+  <div class="modal fade" id="skipReasonModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header border-bottom py-3">
+          <h5 class="modal-title fw-bold text-danger"><i class="bi bi-question-circle me-1"></i>Why are you not applying?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <p class="small text-secondary mb-3">Recording your reason helps track your job search analytics and prevents suggesting mismatched roles.</p>
+
+          <form id="skipReasonForm">
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="skipReasonRadio" id="reasonSalary" value="Salary too low / not disclosed" checked>
+              <label class="form-check-label small" for="reasonSalary">💰 Salary too low / not disclosed</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="skipReasonRadio" id="reasonLocation" value="Location / daily commute not suitable">
+              <label class="form-check-label small" for="reasonLocation">📍 Location / daily commute not suitable</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="skipReasonRadio" id="reasonSkills" value="Requires skills I don't have/want">
+              <label class="form-check-label small" for="reasonSkills">⚙ Requires skills I don't have/want (e.g. Heavy Python/AWS)</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="skipReasonRadio" id="reasonCulture" value="Company culture or negative reviews">
+              <label class="form-check-label small" for="reasonCulture">🏢 Company culture or negative reviews</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="skipReasonRadio" id="reasonBond" value="Unfavorable bond / strict notice period">
+              <label class="form-check-label small" for="reasonBond">⏳ Unfavorable bond / strict notice period requirements</label>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="skipReasonRadio" id="reasonAlreadyApplied" value="Already applied">
+              <label class="form-check-label small fw-bold text-primary" for="reasonAlreadyApplied">✅ Already applied</label>
+            </div>
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="radio" name="skipReasonRadio" id="reasonOther" value="Other">
+              <label class="form-check-label small" for="reasonOther">✍ Other custom reason (specify below)</label>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small text-secondary">Custom Note / Specific Reason (Optional):</label>
+              <textarea class="form-control small" id="skipCustomNote" rows="2" placeholder="e.g. Applied via referral or direct HR email"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer border-top py-2">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger btn-sm" id="confirmSkipReasonBtn">Confirm &amp; Save Reason</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Application Submission Confirmation (Mandatory Check) -->
+  <div class="modal fade" id="applyConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header border-bottom py-3">
+          <h5 class="modal-title fw-bold text-success"><i class="bi bi-send-check me-2"></i>Confirm Application Submission</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4 text-center">
+          <i class="bi bi-question-circle text-primary fs-1 mb-2"></i>
+          <h5 class="fw-bold text-dark">Did you submit your application on the employer portal?</h5>
+          <p class="small text-secondary mb-3">
+            Opening a job link opens the external portal in a new tab. In Version 3, your status is <strong>never marked as Applied automatically</strong>. Please confirm your actual submission status below:
+          </p>
+
+          <div class="p-3 bg-light rounded text-start mb-3 border">
+            <div class="small fw-bold text-dark" id="confirmJobTitle">PHP Developer</div>
+            <div class="small text-muted" id="confirmJobCompany">Company Name</div>
+          </div>
+        </div>
+        <div class="modal-footer border-top py-2 d-flex justify-content-between">
+          <button type="button" class="btn btn-outline-secondary btn-sm" id="btnKeepOpened">
+            <i class="bi bi-eye me-1"></i>Application Opened (Not Yet Submitted)
+          </button>
+          <button type="button" class="btn btn-success btn-sm px-3" id="btnConfirmApplied">
+            <i class="bi bi-check-circle-fill me-1"></i>Yes, Mark as Applied
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: Settings & Profile -->
+  <div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header border-bottom py-3">
+          <h5 class="modal-title fw-bold"><i class="bi bi-sliders me-2 text-primary"></i>Candidate Profile &amp; Settings</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="alert alert-info py-2 px-3 small">
+            <i class="bi bi-info-circle me-1"></i>All skills and achievements are cited directly from primary portfolio documents (<code>php-dev.html</code>, <code>software-dev.html</code>, <code>full-stack.html</code>).
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Candidate Name:</label>
+              <input type="text" class="form-control form-control-sm" value="Nishanth R" readonly />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Experience:</label>
+              <input type="text" class="form-control form-control-sm" value="5.0 Years Industry Experience" readonly />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Public Contact (Masked):</label>
+              <input type="text" class="form-control form-control-sm" value="r.***@gmail.com | +91 ********76" readonly />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-bold">Target Cities:</label>
+              <input type="text" class="form-control form-control-sm" value="Coimbatore, Chennai, Bangalore, Remote India" readonly />
+            </div>
+          </div>
+
+          <hr />
+          <h6 class="fw-bold small text-dark mb-2">Verified Employers</h6>
+          <ul class="list-group list-group-flush small mb-3">
+            <li class="list-group-item px-0">
+              <strong>Icore Software Technologies</strong> (Jun 2025 – Present) · Software Developer (PHP / Full-Stack)
+            </li>
+            <li class="list-group-item px-0">
+              <strong>Rk Creators</strong> (Sep 2022 – Jun 2025) · PHP / Full-Stack Developer
+            </li>
+          </ul>
+
+          <h6 class="fw-bold small text-dark mb-2">Four Master Resume Variants</h6>
+          <div class="d-flex flex-wrap gap-2">
+            <span class="badge bg-primary px-3 py-2">1. PHP Developer Resume</span>
+            <span class="badge bg-primary px-3 py-2">2. Software Developer Resume</span>
+            <span class="badge bg-primary px-3 py-2">3. Application Developer Resume</span>
+            <span class="badge bg-primary px-3 py-2">4. Full Stack Developer Resume</span>
+          </div>
+        </div>
+        <div class="modal-footer border-top py-2">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- JobHuntAI V3 Dashboard Script -->
+  <script src="js/app.js"></script>
+</body>
+</html>
+

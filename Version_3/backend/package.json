@@ -1,0 +1,27 @@
+{
+  "name": "jobhuntai-backend-v3",
+  "version": "3.0.0",
+  "description": "JobHuntAI Version 3 - Cloud Backend with JWT Auth, Two-Stage Pipeline, and Concurrency Protection",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test": "node ../tests/run-all-tests.js",
+    "backup": "node ../scripts/backup-restore.js --backup",
+    "restore": "node ../scripts/backup-restore.js --restore",
+    "sanitize": "node ../scripts/sanitize-feed.js"
+  },
+  "keywords": [
+    "job-hunter",
+    "recruitment-ai",
+    "job-matching",
+    "backend"
+  ],
+  "author": "Nishanth R",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5"
+  }
+}

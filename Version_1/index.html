@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nishanth R - Job Hunter & Auto-Apply Dashboard (Top 20 Ranked Jobs)</title>
+  
+  <!-- Bootstrap 5 & Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  
+  <!-- Custom Styling -->
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .skill-pill { cursor: pointer; transition: all 0.15s ease; user-select: none; }
+    .skill-pill:hover { transform: scale(1.05); }
+    .skill-highlight-match { background-color: #d1e7dd !important; color: #0f5132 !important; font-weight: bold; padding: 2px 4px; border-radius: 4px; }
+    .skill-highlight-gap { background-color: #fff3cd !important; color: #664d03 !important; font-weight: bold; padding: 2px 4px; border-radius: 4px; }
+    .company-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top py-2">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand navbar-brand-custom" href="./">
+        <div class="brand-icon">
+          <i class="bi bi-briefcase-fill"></i>
+        </div>
+        <span>JobHunt<span class="text-dark">AI</span> <small class="text-secondary fs-6 fw-normal ms-1">| Nishanth R (5 Yrs PHP/Laravel)</small></span>
+      </a>
+
+      <div class="d-flex align-items-center gap-2 ms-auto">
+        <span class="badge bg-light text-dark border d-none d-lg-flex align-items-center gap-1 px-3 py-2">
+          <i class="bi bi-clock-history text-primary"></i>
+          <span>6:00 AM + Every 3h Alerts</span>
+        </span>
+
+        <a href="https://nishanth0303.github.io/job-hunter-auto-apply" target="_blank" class="badge bg-light text-primary border text-decoration-none d-none d-md-flex align-items-center gap-1 px-3 py-2">
+          <i class="bi bi-globe2"></i>
+          <span>Live: nishanth0303.github.io</span>
+        </a>
+
+        <button class="btn btn-outline-secondary d-flex align-items-center gap-1" id="settingsBtn">
+          <i class="bi bi-sliders"></i>
+          <span>Settings &amp; CV</span>
+        </button>
+
+        <button class="btn btn-primary d-flex align-items-center gap-2" id="scanJobsBtn">
+          <i class="bi bi-search"></i>
+          <span>Scan Top 20 Jobs</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Top 8 Indian Job Portals Bar -->
+  <div class="bg-white border-bottom py-2 shadow-sm">
+    <div class="container-fluid px-4">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <div class="small fw-bold text-uppercase text-secondary d-flex align-items-center gap-1">
+          <i class="bi bi-geo-alt-fill text-danger"></i>
+          <span>Top 8 India Portals (Coimbatore / Chennai / Bangalore / Remote):</span>
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+          <a href="https://www.naukri.com/php-developer-jobs" target="_blank" class="badge badge-portal badge-naukri portal-pill">
+            <i class="bi bi-briefcase-fill"></i> Naukri (Must Use)
+          </a>
+          <a href="https://www.linkedin.com/jobs/search/?keywords=PHP+Developer&location=India" target="_blank" class="badge badge-portal badge-linkedin portal-pill">
+            <i class="bi bi-linkedin"></i> LinkedIn
+          </a>
+          <a href="https://www.instahyre.com/" target="_blank" class="badge badge-portal badge-instahyre portal-pill">
+            <i class="bi bi-lightning-charge-fill"></i> Instahyre
+          </a>
+          <a href="https://cutshort.io/jobs/php-laravel-symfony-jobs-in-chennai" target="_blank" class="badge badge-portal badge-cutshort portal-pill">
+            <i class="bi bi-code-slash"></i> Cutshort
+          </a>
+          <a href="https://www.foundit.in/search/php-jobs" target="_blank" class="badge badge-portal badge-foundit portal-pill">
+            <i class="bi bi-search"></i> Foundit
+          </a>
+          <a href="https://in.indeed.com/q-php-%26-laravel-developer-l-tamil-nadu-jobs.html" target="_blank" class="badge badge-portal badge-indeed portal-pill">
+            <i class="bi bi-check2-circle"></i> Indeed
+          </a>
+          <a href="https://www.hirist.tech/j/php-developer-laravel-codeigniter-1637097?jobPos=3" target="_blank" class="badge badge-portal badge-hirist portal-pill">
+            <i class="bi bi-stars"></i> Hirist
+          </a>
+          <a href="https://wellfound.com/jobs/4092860-laravel-developer" target="_blank" class="badge badge-portal badge-wellfound portal-pill">
+            <i class="bi bi-peace"></i> Wellfound
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="container-fluid px-4 py-3">
+
+    <!-- Chrome Auto-Apply & Bookmarklet Helper Bar -->
+    <div class="card mb-3 border bg-white shadow-sm">
+      <div class="card-body p-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-3">
+          <span class="badge bg-dark fs-6 py-2 px-3"><i class="bi bi-lightning-charge-fill text-warning me-1"></i>1-Click Auto-Apply</span>
+          <div class="small text-muted">
+            Directly redirects to the <strong class="text-dark">exact job post page</strong> (not search). Uses our <strong class="text-primary">Chrome Extension</strong> or <strong class="text-primary">Bookmarklet</strong> to auto-paste your cover letter &amp; submit while logged in!
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <a href="javascript:(function(){const ta=document.querySelector('textarea');if(ta){ta.value='Dear Hiring Team,\n\nI am applying for this role. With 5 years experience in PHP, Laravel 10, CodeIgniter, MySQL, and REST APIs, I specialize in clean architecture and business software.\n\nPortfolio: https://nishanth0303.github.io/Nishanth-portfolio/php-dev.html\n\nNishanth R | +91 8220607076 | r.nishanth2004@gmail.com';ta.dispatchEvent(new Event('input',{bubbles:true}));ta.dispatchEvent(new Event('change',{bubbles:true}));}const btns=Array.from(document.querySelectorAll('button,input[type=submit]'));const b=btns.find(x=>x.innerText&&x.innerText.trim().toLowerCase()==='apply'||x.innerText&&x.innerText.trim().toLowerCase().includes('apply to'));if(b){b.click();alert('⚡ Auto-applied via JobHuntAI Bookmarklet for Nishanth R!');}else{alert('📋 Cover letter filled into form! Click Apply to complete.');}})();" class="btn btn-sm btn-outline-primary fw-semibold" title="Drag this button to your Chrome Bookmarks Bar">
+            ⭐ Drag: ⚡ 1-Click Auto-Apply Bookmarklet
+          </a>
+          <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#extensionGuideModal">
+            <i class="bi bi-question-circle me-1"></i>How Auto-Apply Works
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Metrics Row -->
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card stat-card">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <div class="text-muted small fw-semibold text-uppercase">Top Ranked Jobs</div>
+              <div class="stat-number mt-1 text-primary" id="statTotal">20</div>
+            </div>
+            <div class="stat-icon primary">
+              <i class="bi bi-trophy-fill"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card stat-card">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <div class="text-muted small fw-semibold text-uppercase">Pending Review</div>
+              <div class="stat-number mt-1 text-warning" id="statPending">0</div>
+            </div>
+            <div class="stat-icon warning">
+              <i class="bi bi-hourglass-split"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card stat-card">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <div class="text-muted small fw-semibold text-uppercase">Auto-Applied</div>
+              <div class="stat-number mt-1 text-success" id="statApplied">0</div>
+            </div>
+            <div class="stat-icon success">
+              <i class="bi bi-send-check-fill"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card stat-card">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <div class="text-muted small fw-semibold text-uppercase">Skipped / Reasons</div>
+              <div class="stat-number mt-1 text-secondary" id="statSkipped">0</div>
+            </div>
+            <div class="stat-icon info">
+              <i class="bi bi-x-octagon-fill"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Card with Table & Day-by-Day Report -->
+    <div class="card">
+      <div class="card-header bg-white border-bottom py-3">
+        <div class="d-flex flex-column gap-2 w-100">
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <!-- Primary Status Filter Tabs -->
+            <div class="btn-group btn-group-sm" role="group">
+              <button type="button" class="btn btn-outline-secondary active" data-filter="all">All Statuses</button>
+              <button type="button" class="btn btn-outline-secondary" data-filter="pending">Pending Review</button>
+              <button type="button" class="btn btn-outline-secondary" data-filter="applied">Applied</button>
+              <button type="button" class="btn btn-outline-secondary" data-filter="rejected">Skipped (With Reasons)</button>
+              <button type="button" class="btn btn-outline-primary" id="viewDailyReportBtn">
+                <i class="bi bi-calendar3 me-1"></i>Day-by-Day Report
+              </button>
+            </div>
+
+            <!-- Search & Actions -->
+            <div class="d-flex align-items-center gap-2 ms-auto">
+              <div class="input-group input-group-sm" style="width: 260px;">
+                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control bg-light border-start-0" id="searchInput" placeholder="Search role, portal, city..." />
+              </div>
+
+              <button class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#addJobModal">
+                <i class="bi bi-plus-lg"></i>
+                <span>Add Job</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Date Freshness & Permanent History Filters -->
+          <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 pt-2 border-top">
+            <div class="d-flex flex-wrap align-items-center gap-1" id="dateFilterButtonGroup">
+              <span class="small fw-bold text-muted me-1"><i class="bi bi-funnel me-1"></i>Freshness &amp; History:</span>
+              <button type="button" class="btn btn-sm btn-outline-primary active" data-date-filter="top20" title="Top 20 Best Matches posted strictly within last 30 days">
+                <i class="bi bi-trophy me-1"></i>Current Top 20 (≤30d)
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-success" data-date-filter="today" title="Jobs discovered or posted Today">
+                <i class="bi bi-calendar-check me-1"></i>Today's Jobs
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-warning text-dark" data-date-filter="yesterday" title="Never lose yesterday's hunted jobs">
+                <i class="bi bi-clock-history me-1"></i>Yesterday's Jobs
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-info" data-date-filter="last7days" title="Jobs discovered or posted within the last 7 days">
+                <i class="bi bi-calendar-week me-1"></i>Last 7 Days
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-date-filter="last30days" title="All jobs within rolling 30-day window">
+                <i class="bi bi-calendar-month me-1"></i>Last 30 Days
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-dark" data-date-filter="history" title="Permanent Job History Record (includes older archives)">
+                <i class="bi bi-archive me-1"></i>All Historical Jobs (<span id="historyJobsCount">0</span>)
+              </button>
+            </div>
+            <div class="small text-muted" id="filterResultSummary">
+              Showing <span class="fw-bold text-dark" id="visibleJobsCount">20</span> jobs
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table View -->
+      <div class="table-responsive" id="tableViewContainer">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th scope="col" class="text-center" style="width: 5%;">Rank</th>
+              <th scope="col" style="width: 32%;">Job Title, Company &amp; Website</th>
+              <th scope="col" style="width: 14%;">CV Match</th>
+              <th scope="col" style="width: 14%;">Portal &amp; Date</th>
+              <th scope="col" style="width: 13%;">Status &amp; Skip Reason</th>
+              <th scope="col" style="width: 9%;">Applied On</th>
+              <th scope="col" class="text-end" style="width: 13%;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="jobsTableBody">
+            <!-- Dynamically injected in ranked order -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Day-by-Day Report View (Initially Hidden) -->
+      <div class="p-4" id="dailyReportContainer" style="display: none;">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h5 class="fw-bold mb-1"><i class="bi bi-calendar-check me-2 text-primary"></i>Day-by-Day Tracking &amp; Application Report</h5>
+            <p class="text-muted small mb-0">Comprehensive daily breakdown of discovered, applied, and skipped jobs with your recorded reasons.</p>
+          </div>
+          <button class="btn btn-outline-secondary btn-sm" id="backToTableBtn">
+            <i class="bi bi-arrow-left me-1"></i>Back to Jobs Table
+          </button>
+        </div>
+
+        <div class="card border mb-3">
+          <div class="card-header bg-light d-flex align-items-center justify-content-between py-2">
+            <span class="fw-bold text-dark"><i class="bi bi-calendar-event me-2"></i>Today's Report — <span id="reportDate">Today</span></span>
+            <span class="badge bg-primary">20 Jobs Discovered</span>
+          </div>
+          <div class="card-body">
+            <div class="row g-3 mb-3">
+              <div class="col-md-3">
+                <div class="p-3 bg-light rounded text-center">
+                  <div class="small text-muted text-uppercase fw-semibold">Discovered</div>
+                  <div class="fs-4 fw-bold text-primary mt-1" id="reportDiscoveredCount">20</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="p-3 bg-success-subtle rounded text-center">
+                  <div class="small text-success text-uppercase fw-semibold">Applied</div>
+                  <div class="fs-4 fw-bold text-success mt-1" id="reportAppliedCount">0</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="p-3 bg-warning-subtle rounded text-center">
+                  <div class="small text-warning-emphasis text-uppercase fw-semibold">Pending</div>
+                  <div class="fs-4 fw-bold text-warning mt-1" id="reportPendingCount">20</div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="p-3 bg-danger-subtle rounded text-center">
+                  <div class="small text-danger text-uppercase fw-semibold">Skipped (Not Applied)</div>
+                  <div class="fs-4 fw-bold text-danger mt-1" id="reportSkippedCount">0</div>
+                </div>
+              </div>
+            </div>
+
+            <h6 class="fw-bold mb-2">Detailed Skip Reasons Breakdown:</h6>
+            <div id="skipReasonsBreakdown" class="p-3 bg-light rounded small text-secondary">
+              No skipped jobs yet today. When you skip a job, your chosen reason and notes will appear here.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- MODAL: Job Review & Auto-Apply with Skill Highlighting & Company Details -->
+  <div class="modal fade" id="jobReviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header border-bottom">
+          <div>
+            <h5 class="modal-title fw-bold" id="modalJobTitle">Job Title</h5>
+            <div class="text-muted small d-flex flex-wrap align-items-center gap-2 mt-1">
+              <span id="modalCompany" class="fw-semibold text-dark">Company</span>
+              <span>•</span>
+              <span id="modalLocation">Location</span>
+              <span>•</span>
+              <span id="modalSalary" class="text-success fw-semibold">Salary</span>
+              <span>•</span>
+              <span id="modalExperience" class="badge bg-light text-dark border">4–6 Years</span>
+              <span>•</span>
+              <span id="modalPostedDate" class="small text-muted">Recent</span>
+            </div>
+          </div>
+          <span class="badge bg-primary fs-6 ms-auto me-3" id="modalMatchScore">98% Match</span>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Agent 5 Verification Status Banner -->
+          <div class="card p-2 mb-3 border bg-light shadow-xs" id="agent5VerificationBox">
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-success" id="modalAgent5Badge"><i class="bi bi-shield-check me-1"></i>VERIFIED_DIRECT_URL</span>
+                <span class="small fw-bold text-dark" id="modalAgent5Title">Agent 5 Verified Direct Vacancy</span>
+              </div>
+              <span class="small text-muted" id="modalAgent5Time"><i class="bi bi-clock me-1"></i>Verified</span>
+            </div>
+            <p class="small text-muted mb-0 mt-1" id="modalAgent5Notes">Verified exact individual job vacancy page. Zero search-results or category redirects.</p>
+            <div class="d-flex flex-wrap gap-3 small text-muted border-top pt-2 mt-2" id="modalDatesRow">
+              <span><i class="bi bi-calendar-event me-1 text-primary"></i><strong>Original Post:</strong> <span id="modalOriginalPostDate" class="text-dark fw-semibold">—</span></span>
+              <span><i class="bi bi-binoculars me-1 text-info"></i><strong>First Discovered:</strong> <span id="modalFirstDiscoveredDate" class="text-dark fw-semibold">—</span></span>
+              <span><i class="bi bi-check-circle me-1 text-success"></i><strong>Last Verified:</strong> <span id="modalLastCheckedDate" class="text-dark fw-semibold">—</span></span>
+            </div>
+          </div>
+          <!-- Company Website & Overview Card -->
+          <div class="company-card mb-3">
+            <div class="d-flex align-items-center justify-content-between mb-1">
+              <div class="fw-bold text-dark fs-6 d-flex align-items-center gap-2">
+                <i class="bi bi-building-check text-primary"></i>
+                <span id="modalCompanyName">Company Name</span>
+              </div>
+              <a href="#" target="_blank" class="btn btn-outline-primary btn-sm py-0 px-2" id="modalCompanyWebsite">
+                <i class="bi bi-box-arrow-up-right me-1"></i>Official Website
+              </a>
+            </div>
+            <p class="small text-muted mb-0" id="modalCompanyDetails">Company overview and business details.</p>
+          </div>
+
+          <!-- Suggested Resume Variant -->
+          <div class="d-flex align-items-center justify-content-between p-2 mb-3 bg-white border rounded shadow-sm">
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge bg-primary-subtle text-primary border border-primary-subtle"><i class="bi bi-file-earmark-person me-1"></i>Suggested Resume</span>
+              <span class="fw-bold small text-dark" id="modalMatchedResume">PHP Developer Resume</span>
+            </div>
+            <a href="#" target="_blank" class="btn btn-outline-primary btn-sm py-0 px-2" id="modalPortfolioLink">
+              <i class="bi bi-link-45deg me-1"></i>View Portfolio Page
+            </a>
+          </div>
+
+          <!-- Interactive Skill Highlighter Bar -->
+          <div class="card p-3 mb-3 border">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-stars me-1 text-warning"></i>Skills Match Inspector (Click to highlight in JD)</h6>
+              <button class="btn btn-link btn-sm p-0 text-decoration-none" id="clearSkillHighlightBtn">Reset Highlights</button>
+            </div>
+            <div class="mb-2">
+              <span class="small fw-semibold text-success me-2"><i class="bi bi-check-circle-fill me-1"></i>Matched:</span>
+              <span id="modalMatchedSkillsBadges"></span>
+            </div>
+            <div>
+              <span class="small fw-semibold text-warning me-2"><i class="bi bi-exclamation-triangle-fill me-1"></i>Gaps / Missing:</span>
+              <span id="modalUnmatchedSkillsBadges"></span>
+            </div>
+          </div>
+
+          <!-- Job Description (Text with Highlight Support) -->
+          <div class="mb-4">
+            <h6 class="fw-bold text-dark mb-2">Job Description</h6>
+            <div class="p-3 bg-light rounded text-secondary small" id="modalDescription" style="max-height: 180px; overflow-y: auto; line-height: 1.6;"></div>
+          </div>
+
+          <!-- Why You Fit -->
+          <div class="alert fit-alert p-3 mb-3">
+            <h6 class="fw-bold text-success mb-1"><i class="bi bi-check-circle-fill me-2"></i>Why You Fit This Role</h6>
+            <p class="small mb-0 text-dark" id="modalFitReason"></p>
+          </div>
+
+          <!-- Tailored Cover Letter -->
+          <div>
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h6 class="fw-bold text-dark mb-0">Tailored Cover Letter (Nishanth R)</h6>
+              <button class="btn btn-outline-secondary btn-sm" id="copyCoverLetterBtn">
+                <i class="bi bi-clipboard me-1"></i>Copy Letter
+              </button>
+            </div>
+            <textarea class="form-control cover-letter-preview" id="modalCoverLetter" rows="9"></textarea>
+            <div class="form-text small text-muted">Personalized with your experience at Icore, Rk Creators &amp; contact info.</div>
+          </div>
+        </div>
+
+        <div class="modal-footer border-top justify-content-between">
+          <div class="d-flex flex-wrap gap-2">
+            <a href="#" target="_blank" class="btn btn-outline-primary" id="modalJobLink" title="Open Agent 5 Verified Direct Job Post">
+              <i class="bi bi-link-45deg me-1"></i>Exact Job Post Page
+            </a>
+            <a href="#" target="_blank" class="btn btn-outline-success" id="modalApplyUrlLink" title="Open Official Employer Application Portal">
+              <i class="bi bi-send-check me-1"></i>Official Application Page
+            </a>
+            <a href="#" target="_blank" class="btn btn-outline-info" id="modalRecruiterLink">
+              <i class="bi bi-chat-left-dots me-1"></i>Recruiter Hiring Post
+            </a>
+            <button type="button" class="btn btn-outline-warning" id="modalResetBtn" style="display: none;">
+              <i class="bi bi-arrow-counterclockwise me-1"></i>Reset to Pending
+            </button>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-danger" id="notWillingToApplyBtn">
+              <i class="bi bi-x-circle me-1"></i>Not Applying (Give Reason)
+            </button>
+            <button type="button" class="btn btn-success fw-semibold" id="approveApplyBtn">
+              <i class="bi bi-box-arrow-up-right me-1"></i>Open &amp; Apply on <span id="modalApplyBtnPortalName">Portal</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Not Applying / Skip Reason Input -->
+  <div class="modal fade" id="skipReasonModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header border-bottom">
+          <h5 class="modal-title fw-bold text-danger"><i class="bi bi-question-circle me-2"></i>Why are you not applying?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p class="small text-muted mb-3">Recording your reason helps track your job search analytics and avoids suggesting similar mismatched roles in your daily report.</p>
+
+          <!-- Pre-set options -->
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="skipReasonRadio" id="reason1" value="Salary too low or not disclosed" checked>
+            <label class="form-check-label small" for="reason1">💰 Salary too low / not disclosed</label>
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="skipReasonRadio" id="reason2" value="Location or daily commute not suitable">
+            <label class="form-check-label small" for="reason2">📍 Location / daily commute not suitable</label>
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="skipReasonRadio" id="reason3" value="Requires skills I don't have or prefer not to use">
+            <label class="form-check-label small" for="reason3">⚙️ Requires skills I don't have/want (e.g. Heavy Python/AWS)</label>
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="skipReasonRadio" id="reason4" value="Company culture or negative reviews">
+            <label class="form-check-label small" for="reason4">🏢 Company culture or negative reviews</label>
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="skipReasonRadio" id="reason5" value="Unfavorable bond or notice period requirements">
+            <label class="form-check-label small" for="reason5">⏳ Unfavorable bond / strict notice period requirements</label>
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="radio" name="skipReasonRadio" id="reasonAlreadyApplied" value="Already applied">
+            <label class="form-check-label small" for="reasonAlreadyApplied">✅ Already applied</label>
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="radio" name="skipReasonRadio" id="reasonOther" value="other">
+            <label class="form-check-label small" for="reasonOther">✍️ Other custom reason (specify below)</label>
+          </div>
+
+          <!-- Custom Text Input -->
+          <div class="mb-2">
+            <label class="form-label small fw-semibold">Custom Note / Specific Reason (Optional or when choosing Other):</label>
+            <textarea class="form-control" id="customSkipReasonText" rows="3" placeholder="e.g. Position requires immediate joining in 15 days, or on-site 6 days a week..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer border-top">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmSkipReasonBtn">Confirm &amp; Save Reason</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Verify Portal Application Submission -->
+  <div class="modal fade" id="applyConfirmModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold"><i class="bi bi-box-arrow-up-right me-2"></i>Redirected to <span id="confirmPortalName">Portal</span> Post Page</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="d-flex align-items-center gap-3 mb-3 p-3 bg-light rounded border">
+            <div class="fs-1 text-primary"><i class="bi bi-building-check"></i></div>
+            <div>
+              <div class="fw-bold text-dark fs-6" id="confirmJobTitle">Job Title</div>
+              <div class="text-muted small" id="confirmCompany">Company Name</div>
+            </div>
+          </div>
+
+          <div class="alert alert-success d-flex align-items-center gap-2 py-2 mb-3">
+            <i class="bi bi-clipboard-check-fill fs-5 text-success"></i>
+            <div class="small">
+              <strong>Cover Note Copied!</strong> Your tailored cover letter is copied to your clipboard. Press <kbd>Ctrl+V</kbd> to paste it into the application form.
+            </div>
+          </div>
+
+          <div class="alert alert-info py-2 mb-3">
+            <div class="small">
+              <i class="bi bi-lightning-charge-fill text-warning me-1"></i>
+              <strong>Auto-Apply Assistant:</strong> If you have loaded the Chrome Extension, it will automatically fill the form and click the Apply button. If not, paste your note and click Apply on the portal tab.
+            </div>
+          </div>
+
+          <div class="text-center my-3">
+            <a href="#" target="_blank" class="btn btn-sm btn-outline-primary" id="reopenPortalLink">
+              <i class="bi bi-box-arrow-up-right me-1"></i>Re-open Exact Job Post Page
+            </a>
+          </div>
+
+          <hr class="my-3">
+
+          <p class="fw-semibold text-dark small mb-2 text-center">Did you complete submission on the portal?</p>
+          <div class="d-grid gap-2">
+            <button type="button" class="btn btn-success fw-bold py-2" id="confirmSubmittedBtn">
+              <i class="bi bi-check2-circle me-1"></i>Yes, I Submitted (Mark as Applied)
+            </button>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-outline-secondary w-50" data-bs-dismiss="modal">
+                <i class="bi bi-hourglass-split me-1"></i>Still In Progress
+              </button>
+              <button type="button" class="btn btn-outline-danger w-50" id="confirmDidNotApplyBtn">
+                <i class="bi bi-x-circle me-1"></i>Didn't Apply
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: How Auto-Apply Works Guide -->
+  <div class="modal fade" id="extensionGuideModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header border-bottom">
+          <h5 class="modal-title fw-bold"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>How 1-Click Auto-Apply Works</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="alert alert-primary mb-3">
+            <strong>Why Portals Need Authentication:</strong> Portals like Wellfound, Naukri, and LinkedIn require you to be signed in to submit job applications to your personal candidate profile. A standalone website cannot secretly submit forms into your account without a browser extension or bookmarklet.
+          </div>
+
+          <h6 class="fw-bold text-dark mb-2">Option 1: Chrome Extension (Fully Automated)</h6>
+          <ol class="small text-muted mb-3">
+            <li>Open Chrome and go to <code>chrome://extensions</code></li>
+            <li>Enable <strong>Developer Mode</strong> (top right toggle).</li>
+            <li>Click <strong>Load unpacked</strong> and select the <code>extension</code> folder in this project repository.</li>
+            <li>Now whenever you click <strong>"Approve &amp; Apply"</strong>, the job opens and the extension automatically pastes your customized cover letter and triggers the Apply button!</li>
+          </ol>
+
+          <h6 class="fw-bold text-dark mb-2">Option 2: 1-Click Auto-Apply Bookmarklet (Instant, No Installation)</h6>
+          <ol class="small text-muted mb-0">
+            <li>Drag the blue <strong>"⭐ Drag: ⚡ 1-Click Auto-Apply Bookmarklet"</strong> button directly onto your Chrome Bookmarks Bar.</li>
+            <li>When you open any job page (e.g. Wellfound, Naukri, LinkedIn), click that bookmark in your bookmarks bar.</li>
+            <li>It instantly injects your customized cover note into the application box and clicks Apply!</li>
+          </ol>
+        </div>
+        <div class="modal-footer border-top">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Got It!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Settings & CV -->
+  <div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header border-bottom">
+          <h5 class="modal-title fw-bold"><i class="bi bi-sliders me-2 text-primary"></i>Nishanth R - Job Hunter Settings &amp; CV</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label fw-semibold">Target Job Roles (comma separated)</label>
+              <textarea class="form-control" id="settingRoles" rows="3" placeholder="e.g. Laravel Developer, PHP Backend Developer"></textarea>
+            </div>
+
+            <!-- Job Match Tiers Reference -->
+            <div class="col-12">
+              <div class="card bg-light border p-3">
+                <div class="fw-bold small text-uppercase text-secondary mb-2">🎯 Resume Match Hierarchy (5 Years PHP / Laravel / CodeIgniter):</div>
+                <div class="mb-2">
+                  <span class="badge bg-success me-1">Excellent (94-98%)</span>
+                  <small class="text-dark">PHP Developer, Laravel Developer, CodeIgniter Developer, PHP Backend Developer, Backend Developer – PHP, Software Developer – PHP, PHP MVC Developer, PHP Laravel Engineer</small>
+                </div>
+                <div class="mb-2">
+                  <span class="badge bg-primary me-1">Very Good (89-93%)</span>
+                  <small class="text-dark">PHP Full Stack Developer, Web Application Developer, Laravel Backend Developer, API Developer – PHP, Software Engineer – PHP, ERP Software Developer, CRM Software Developer, E-commerce Developer</small>
+                </div>
+                <div>
+                  <span class="badge bg-warning text-dark me-1">Good (83-88%)</span>
+                  <small class="text-dark">MySQL Developer, Full Stack Web Developer, Junior React + PHP Developer</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Location Preference</label>
+              <input type="text" class="form-control" id="settingLocation" placeholder="e.g. Coimbatore, Chennai, Bangalore, Remote (Inside India)" />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Notification Recipient Email</label>
+              <input type="email" class="form-control" id="settingEmail" placeholder="r.nishanth2004@gmail.com" />
+            </div>
+            <div class="col-md-12">
+              <label class="form-label fw-semibold">Live Machine / GitHub Pages URL</label>
+              <input type="text" class="form-control" id="settingLiveUrl" placeholder="https://nishanth0303.github.io/job-hunter-auto-apply" />
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Your Full CV / Resume Text (Roles, Skills, Experience)</label>
+              <textarea class="form-control" id="settingCV" rows="7" placeholder="Paste your CV text here..."></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-top">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveSettingsBtn">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Manual Add Job -->
+  <div class="modal fade" id="addJobModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header border-bottom">
+          <h5 class="modal-title fw-bold"><i class="bi bi-plus-circle me-2 text-primary"></i>Track New Job Manually</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Job Title *</label>
+            <input type="text" class="form-control" id="manualTitle" placeholder="e.g. Senior Laravel Developer" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Company *</label>
+            <input type="text" class="form-control" id="manualCompany" placeholder="e.g. Cloudi5 Technologies" required />
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label fw-semibold">Location</label>
+              <input type="text" class="form-control" id="manualLocation" placeholder="Coimbatore" />
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold">Salary</label>
+              <input type="text" class="form-control" id="manualSalary" placeholder="₹12,00,000 / yr" />
+            </div>
+          </div>
+          <div class="row g-2 mb-3">
+            <div class="col-6">
+              <label class="form-label fw-semibold">Match Score (%)</label>
+              <input type="number" class="form-control" id="manualScore" value="95" min="0" max="100" />
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-semibold">Job Post URL</label>
+              <input type="url" class="form-control" id="manualUrl" placeholder="https://..." />
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Job Description</label>
+            <textarea class="form-control" id="manualDesc" rows="3" placeholder="Brief job description..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer border-top">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveManualJobBtn">Add to Dashboard</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer" style="z-index: 1090;"></div>
+
+  <!-- Bootstrap 5 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Application JS -->
+  <script src="js/app.js"></script>
+</body>
+</html>
