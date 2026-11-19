@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <base href="./">
+  <script>
+    // Normalize directory URLs without trailing slash on GitHub Pages so relative data loads correctly
+    if (window.location.hostname.includes('github.io') && !window.location.pathname.endsWith('/') && !window.location.pathname.endsWith('.html')) {
+      window.location.replace(window.location.pathname + '/' + window.location.search + window.location.hash);
+    }
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Nishanth R - Job Hunter & Auto-Apply Dashboard (Top 20 Ranked Jobs)</title>
@@ -506,7 +513,7 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-0 shadow-lg">
         <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title fw-bold"><i class="bi bi-box-arrow-up-right me-2"></i>Redirected to <span id="confirmPortalName">Portal</span> Post Page</h5>
+          <h5 class="modal-title fw-bold"><i class="bi bi-box-arrow-up-right me-2"></i>Redirected to <span id="confirmPortalNameText"><span id="confirmPortalName">Portal</span></span> Post Page</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body p-4">
@@ -648,6 +655,7 @@
         </div>
         <div class="modal-footer border-top">
           <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-outline-danger me-auto btn-sm" id="resetAllOverridesBtn" title="Clear all local application status overrides"><i class="bi bi-arrow-counterclockwise me-1"></i>Reset Status Overrides</button>
           <button type="button" class="btn btn-primary" id="saveSettingsBtn">Save Changes</button>
         </div>
       </div>

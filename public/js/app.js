@@ -316,8 +316,10 @@ function applyFiltersAndRender() {
   
   // 1. Select base pool according to activeDateFilter
   let basePool = allJobs;
-  const todayStr = '2026-11-12';
-  const yesterdayStr = '2026-11-11';
+  const now = new Date();
+  const todayStr = now.toISOString().split('T')[0];
+  const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const yesterdayStr = yesterday.toISOString().split('T')[0];
 
   if (activeDateFilter === 'top20') {
     // Current Top 20 eligible jobs (strictly <= 30 days old)
@@ -760,7 +762,8 @@ async function startPortalApply(id) {
   // 3. Populate and show verification modal
   const portalName = job.source || 'Portal';
   document.getElementById('confirmPortalName').innerText = portalName;
-  document.getElementById('confirmPortalNameText').innerText = portalName;
+  const portalEl = document.getElementById('confirmPortalNameText') || document.getElementById('confirmPortalName');
+  if (portalEl) portalEl.innerText = portalName;
   document.getElementById('confirmJobTitle').innerText = job.title;
   document.getElementById('confirmCompany').innerText = job.company;
   document.getElementById('reopenPortalLink').href = targetApplyUrl;
