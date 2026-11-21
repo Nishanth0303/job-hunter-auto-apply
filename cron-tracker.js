@@ -1,3 +1,4 @@
+const agent1 = require('./agent1-harvester');
 const historyManager = require('./history-manager');
 const agent5 = require('./agent5-verifier');
 /**
@@ -54,8 +55,13 @@ function getISTDate() {
 function scanPortals(config) {
   const ist = getISTDate();
   const history = historyManager.loadJobHistory();
-  // Record daily scan, enforce 30-day freshness, preserve yesterday's records
-  const result = historyManager.recordDailyScan(history.jobs, ist.dateStr);
+  // 1. Harvest freshly discovered jobs for today from Agent 1
+  const freshJobs = agent1.harvestFreshJobs(ist.dateStr);
+  console.log(`[Agent 1 Discovery] Harvested ${freshJobs.length} fresh vacancies for ${ist.dateStr}`);
+  
+  // 2. Merge newly discovered jobs with historical jobs, enforcing 30-day gate & preserving statuses
+  const allCandidates = [...freshJobs, ...history.jobs];
+  const result = historyManager.recordDailyScan(allCandidates, ist.dateStr);
   return result.top20Jobs;
 }
 
