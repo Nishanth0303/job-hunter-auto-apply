@@ -1,6 +1,10 @@
 {
   "last_scan_date": "2026-11-21",
+<<<<<<< HEAD
   "total_jobs_tracked": 26,
+=======
+  "total_jobs_tracked": 22,
+>>>>>>> b7c89ee14c674956110b3c96e22e786d23da700b
   "jobs": [
     {
       "job_id": "job-in-01",
